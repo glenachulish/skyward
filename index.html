@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Skyward</title>
+    <style>
+        body, html { margin: 0; padding: 0; font-family: sans-serif; background-color: #0f172a; color: #f8fafc; height: 100%; overflow: hidden; }
+        #app-content { height: calc(100vh - 60px); overflow-y: auto; padding: 20px; }
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 60px; background-color: #1e293b; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #334155; }
+        .nav-btn { background: none; border: none; color: #94a3b8; font-size: 14px; cursor: pointer; }
+        .nav-btn.active { color: #38bdf8; }
+        .card { background-color: #1e293b; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <div id="app-content">
+        <h2>Unified Map</h2>
+        <div class="card"><p>Met Office Map / Vector Data will load here.</p></div>
+    </div>
+    <div class="bottom-nav">
+        <button class="nav-btn active" onclick="switchView('map', this)">Map</button>
+        <button class="nav-btn" onclick="switchView('webcams', this)">Webcams</button>
+        <button class="nav-btn" onclick="switchView('library', this)">Library</button>
+    </div>
+    <script>
+        function switchView(viewName, element) {
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+            const content = document.getElementById('app-content');
+            if (viewName === 'map') content.innerHTML = '<h2>Unified Map</h2><div class="card"><p>Met Office Map loading...</p></div>';
+            else if (viewName === 'webcams') content.innerHTML = '<h2>Webcams</h2><div class="card"><p>Webcam grid loading...</p></div>';
+            else if (viewName === 'library') content.innerHTML = '<h2>The Library</h2><div class="card"><p>Educational content loading...</p></div>';
+        }
+    </script>
+</body>
+</html>
