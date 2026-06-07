@@ -1,0 +1,17 @@
+{
+  "_comment": "Met Office mountain (summit-level) forecasts. Verified slugs from weather.metoffice.gov.uk/specialist-forecasts/mountain. Each area has a web page and a clean PDF. These give multi-elevation wind/temp/feels-like/freezing-level tables, hazards and a meteorologist's view. 'mwis' maps each to the nearest Skyward MWIS area id (mwis-areas.json) so the Forecast tab can show Met Office + MWIS side by side. © Crown Copyright.",
+  "base": "https://weather.metoffice.gov.uk/specialist-forecasts/mountain",
+  "pdf_base": "https://data.consumer-digital.api.metoffice.gov.uk/v1/mountain",
+  "areas": [
+    { "slug": "northwest-highlands", "name": "Northwest Highlands", "mwis": "northwest-highlands" },
+    { "slug": "north-grampian", "name": "North Grampian", "mwis": "cairngorms" },
+    { "slug": "south-grampian-and-southeast-highlands", "name": "South Grampian & SE Highlands", "mwis": "southeastern-highlands" },
+    { "slug": "southwest-highlands", "name": "Southwest Highlands", "mwis": "west-highlands" },
+    { "slug": "mourne-mountains", "name": "Mourne Mountains", "mwis": null },
+    { "slug": "lake-district", "name": "Lake District", "mwis": "lake-district" },
+    { "slug": "yorkshire-dales", "name": "Yorkshire Dales", "mwis": "yorkshire-dales" },
+    { "slug": "peak-district", "name": "Peak District", "mwis": "peak-district" },
+    { "slug": "snowdonia", "name": "Eryri / Snowdonia", "mwis": "snowdonia" },
+    { "slug": "brecon-beacons", "name": "Bannau Brycheiniog / Brecon Beacons", "mwis": "brecon" }
+  ]
+}

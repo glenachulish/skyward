@@ -1,0 +1,140 @@
+{
+  "_comment": "Skyward Library — the educational curriculum. Five modules per the blueprint. Each topic carries attributed source links (Met Office, RMetS, NOAA, etc.) to drive traffic to origin, per the core app requirement.",
+  "modules": [
+    {
+      "id": "decoding-the-map",
+      "number": 1,
+      "title": "Decoding the Map",
+      "summary": "Isobars, high and low pressure systems, and how to read a synoptic chart.",
+      "topics": [
+        {
+          "id": "isobars",
+          "title": "Isobars & pressure",
+          "body": "Isobars are lines joining points of equal mean sea-level pressure. Tightly packed isobars mean a steep pressure gradient — and strong wind. Widely spaced isobars mean light winds. The wind blows almost parallel to the isobars (not across them), a consequence of the Earth's rotation.",
+          "sources": [
+            { "name": "Royal Meteorological Society — how to interpret a weather chart", "url": "https://www.rmets.org/metmatters/how-interpret-weather-chart" }
+          ]
+        },
+        {
+          "id": "highs-lows",
+          "title": "Highs & lows",
+          "body": "In the northern hemisphere, wind circulates clockwise around high pressure (anticyclones) and anticlockwise around low pressure (depressions). Highs bring settled, often dry weather; lows bring unsettled, wetter, windier conditions and carry the frontal systems that dominate UK mountain weather.",
+          "sources": [
+            { "name": "Met Office — learn about weather", "url": "https://weather.metoffice.gov.uk/maps-and-charts/surface-pressure" }
+          ]
+        },
+        {
+          "id": "synoptic-charts",
+          "title": "Reading synoptic charts",
+          "body": "A synoptic chart is a snapshot of the atmosphere: isobars, pressure centres, and fronts. Learning to read one lets you anticipate the weather hours ahead rather than just reacting to it. Compare charts across several time steps to see systems approaching.",
+          "sources": [
+            { "name": "Met Office surface pressure charts", "url": "https://weather.metoffice.gov.uk/maps-and-charts/surface-pressure" },
+            { "name": "Weathercharts.org — UK MSLP", "url": "https://www.weathercharts.org/ukmomslp.htm" },
+            { "name": "Met Éireann — Atlantic charts", "url": "https://www.met.ie/forecasts/atlantic-charts/precipitation-pressure" },
+            { "name": "MWIS synoptic charts", "url": "https://www.mwis.org.uk/forecasts/synoptic-charts" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "the-battlegrounds",
+      "number": 2,
+      "title": "The Battlegrounds",
+      "summary": "The mechanics and dangers of warm, cold, and occluded fronts.",
+      "topics": [
+        {
+          "id": "warm-front",
+          "title": "Warm fronts",
+          "body": "A warm front is where advancing warm air rides up over cooler air ahead of it. The gentle slope produces a long sequence of thickening, lowering cloud — cirrus, then altostratus, then nimbostratus — and a prolonged spell of rain ahead of the front. Pressure falls as it approaches.",
+          "sources": [
+            { "name": "Royal Meteorological Society", "url": "https://www.rmets.org/metmatters/how-interpret-weather-chart" }
+          ]
+        },
+        {
+          "id": "cold-front",
+          "title": "Cold fronts",
+          "body": "A cold front is where cold air undercuts and shoves up the warm air ahead of it. The steep slope forces air up quickly, producing towering cumulonimbus, heavy showers or thunderstorms, a sharp wind shift, and a temperature drop as it passes. The bad weather is more intense but shorter-lived than a warm front's.",
+          "sources": [
+            { "name": "Royal Meteorological Society", "url": "https://www.rmets.org/metmatters/how-interpret-weather-chart" }
+          ]
+        },
+        {
+          "id": "occluded-front",
+          "title": "Occluded fronts",
+          "body": "An occlusion forms when a faster cold front catches up with the warm front ahead, lifting the warm air entirely off the ground. It combines features of both fronts and often marks a maturing, decaying depression. On a chart it is drawn with alternating triangles and semicircles on the same side.",
+          "sources": [
+            { "name": "Royal Meteorological Society", "url": "https://www.rmets.org/metmatters/how-interpret-weather-chart" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "eyes-to-the-sky",
+      "number": 3,
+      "title": "Eyes to the Sky",
+      "summary": "Identifying cloud formations and reading weather warnings from them.",
+      "topics": [
+        {
+          "id": "ten-clouds",
+          "title": "The ten cloud types",
+          "body": "Clouds are classified by height and form: high (cirrus, cirrocumulus, cirrostratus), middle (altocumulus, altostratus, nimbostratus), and low (stratus, stratocumulus, cumulus, cumulonimbus). Each tells you something about the air's moisture and stability — and what may be coming.",
+          "sources": [
+            { "name": "NOAA JetStream — ten basic clouds", "url": "https://www.noaa.gov/jetstream/clouds/ten-basic-clouds" },
+            { "name": "Met Office — types of clouds", "url": "https://weather.metoffice.gov.uk/learn-about/weather/types-of-weather/clouds" },
+            { "name": "What's This Cloud — identification guide", "url": "https://www.whatsthiscloud.com/cloud-identification" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sky-magic",
+      "number": 4,
+      "title": "Sky Magic",
+      "summary": "A glossary of optical phenomena — halos, brocken spectres, glories.",
+      "topics": [
+        {
+          "id": "halos",
+          "title": "Halos",
+          "body": "A 22° halo is a ring of light around the sun or moon, caused by refraction through hexagonal ice crystals in high cirrus cloud. Because cirrus often precedes a warm front, a halo can be an early warning of approaching rain.",
+          "sources": [
+            { "name": "Met Office — optical effects", "url": "https://weather.metoffice.gov.uk/learn-about/weather/optical-effects" },
+            { "name": "MeteoSwiss — halo phenomena", "url": "https://www.meteoswiss.admin.ch/weather/weather-and-climate-from-a-to-z/halo-phenomena-optical-phenomena-at-fog-margins.html" }
+          ]
+        },
+        {
+          "id": "brocken-spectre",
+          "title": "Brocken spectre & glory",
+          "body": "A brocken spectre is your own shadow cast onto cloud or mist below you, often ringed by a glory — coloured rings caused by diffraction of light by water droplets. A classic mountain-top sight when the sun is behind you and cloud fills the corrie ahead.",
+          "sources": [
+            { "name": "Met Office — optical effects", "url": "https://weather.metoffice.gov.uk/learn-about/weather/optical-effects" },
+            { "name": "CIRA — optical phenomena", "url": "https://rammb.cira.colostate.edu/dev/hillger/optical-phenomena.htm" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "snowpack-safety",
+      "number": 5,
+      "title": "Snowpack & Safety",
+      "summary": "Winter guides: SAIS hazard roses, snowpack physics, weak layers, snow pits.",
+      "topics": [
+        {
+          "id": "hazard-scale",
+          "title": "The avalanche hazard scale",
+          "body": "SAIS rates avalanche hazard on a five-point European scale: Low, Moderate, Considerable, High, and Very High, colour-coded green through red. The rating varies by aspect and altitude — the hazard rose on each forecast shows which slopes are dangerous.",
+          "sources": [
+            { "name": "Scottish Avalanche Information Service", "url": "https://www.sais.gov.uk/" }
+          ]
+        },
+        {
+          "id": "weak-layers",
+          "title": "Weak layers & snow pits",
+          "body": "Avalanches happen when a weak layer buried in the snowpack fails under load. Digging a snow pit lets you inspect the layers, test how well they're bonded, and judge stability before committing to a slope.",
+          "sources": [
+            { "name": "Scottish Avalanche Information Service", "url": "https://www.sais.gov.uk/" }
+          ]
+        }
+      ]
+    }
+  ]
+}

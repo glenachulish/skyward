@@ -1,0 +1,810 @@
+{
+  "_comment": "100 UK summits from the Database of British & Irish Hills (hills-database.co.uk), used under its non-commercial licence. Verified summit coordinates + heights. slug builds https://www.mountain-forecast.com/peaks/{slug}; a few may need manual correction. area = nearest MWIS forecast area.",
+  "source_base": "https://www.mountain-forecast.com/peaks",
+  "attribution": {
+    "coords": "Database of British & Irish Hills",
+    "forecast": "mountain-forecast.com (Meteo365 Ltd)"
+  },
+  "peaks": [
+    {
+      "name": "Ben Nevis",
+      "slug": "Ben-Nevis",
+      "h": 1345,
+      "lat": 56.79689,
+      "lon": -5.00368,
+      "area": "west-highlands"
+    },
+    {
+      "name": "Ben Macdui",
+      "slug": "Ben-Macdui",
+      "h": 1309,
+      "lat": 57.07037,
+      "lon": -3.6691,
+      "area": "cairngorms"
+    },
+    {
+      "name": "Braeriach",
+      "slug": "Braeriach",
+      "h": 1296,
+      "lat": 57.0783,
+      "lon": -3.72837,
+      "area": "cairngorms"
+    },
+    {
+      "name": "Cairn Toul",
+      "slug": "Cairn-Toul",
+      "h": 1292,
+      "lat": 57.05441,
+      "lon": -3.71076,
+      "area": "cairngorms"
+    },
+    {
+      "name": "Sgor an Lochain Uaine",
+      "slug": "Sgor-an-Lochain-Uaine",
+      "h": 1258,
+      "lat": 57.05837,
+      "lon": -3.72588,
+      "area": "cairngorms"
+    },
+    {
+      "name": "Cairn Gorm",
+      "slug": "Cairn-Gorm",
+      "h": 1245,
+      "lat": 57.11671,
+      "lon": -3.64448,
+      "area": "cairngorms"
+    },
+    {
+      "name": "Aonach Beag",
+      "slug": "Aonach-Beag",
+      "h": 1234,
+      "lat": 56.8,
+      "lon": -4.95414,
+      "area": "west-highlands"
+    },
+    {
+      "name": "Carn Mor Dearg",
+      "slug": "Carn-Mor-Dearg",
+      "h": 1221,
+      "lat": 56.80525,
+      "lon": -4.98662,
+      "area": "west-highlands"
+    },
+    {
+      "name": "Aonach Mor",
+      "slug": "Aonach-Mor",
+      "h": 1220,
+      "lat": 56.81293,
+      "lon": -4.96174,
+      "area": "west-highlands"
+    },
+    {
+      "name": "Ben Lawers",
+      "slug": "Ben-Lawers",
+      "h": 1214,
+      "lat": 56.54492,
+      "lon": -4.22088,
+      "area": "southeastern-highlands"
+    },
+    {
+      "name": "Beinn a Bhuird",
+      "slug": "Beinn-a-Bhuird",
+      "h": 1196,
+      "lat": 57.08758,
+      "lon": -3.49938,
+      "area": "cairngorms"
+    },
+    {
+      "name": "Beinn Mheadhoin",
+      "slug": "Beinn-Mheadhoin",
+      "h": 1183,
+      "lat": 57.09585,
+      "lon": -3.61146,
+      "area": "cairngorms"
+    },
+    {
+      "name": "Carn Eighe",
+      "slug": "Carn-Eighe",
+      "h": 1183,
+      "lat": 57.2877,
+      "lon": -5.11516,
+      "area": "northwest-highlands"
+    },
+    {
+      "name": "Mam Sodhail",
+      "slug": "Mam-Sodhail",
+      "h": 1179,
+      "lat": 57.2798,
+      "lon": -5.12027,
+      "area": "northwest-highlands"
+    },
+    {
+      "name": "Stob Choire Claurigh",
+      "slug": "Stob-Choire-Claurigh",
+      "h": 1178,
+      "lat": 56.82379,
+      "lon": -4.84962,
+      "area": "west-highlands"
+    },
+    {
+      "name": "Ben More",
+      "slug": "Ben-More",
+      "h": 1174,
+      "lat": 56.38595,
+      "lon": -4.54009,
+      "area": "southeastern-highlands"
+    },
+    {
+      "name": "Ben Avon - Leabaidh an Daimh Bhuidhe",
+      "slug": "Ben-Avon-Leabaidh-an-Daimh-Bhuidhe",
+      "h": 1172,
+      "lat": 57.09935,
+      "lon": -3.43444,
+      "area": "cairngorms"
+    },
+    {
+      "name": "Stob Binnein",
+      "slug": "Stob-Binnein",
+      "h": 1165,
+      "lat": 56.37071,
+      "lon": -4.53577,
+      "area": "southeastern-highlands"
+    },
+    {
+      "name": "Beinn Bhrotain",
+      "slug": "Beinn-Bhrotain",
+      "h": 1157,
+      "lat": 57.00987,
+      "lon": -3.7238,
+      "area": "cairngorms"
+    },
+    {
+      "name": "Derry Cairngorm",
+      "slug": "Derry-Cairngorm",
+      "h": 1156,
+      "lat": 57.0628,
+      "lon": -3.622,
+      "area": "cairngorms"
+    },
+    {
+      "name": "Lochnagar - Cac Carn Beag",
+      "slug": "Lochnagar-Cac-Carn-Beag",
+      "h": 1156,
+      "lat": 56.96027,
+      "lon": -3.24526,
+      "area": "cairngorms"
+    },
+    {
+      "name": "Sgurr na Lapaich",
+      "slug": "Sgurr-na-Lapaich",
+      "h": 1152,
+      "lat": 57.36931,
+      "lon": -5.05973,
+      "area": "northwest-highlands"
+    },
+    {
+      "name": "Sgurr nan Ceathramhnan",
+      "slug": "Sgurr-nan-Ceathramhnan",
+      "h": 1150,
+      "lat": 57.25491,
+      "lon": -5.22273,
+      "area": "northwest-highlands"
+    },
+    {
+      "name": "Bidean nam Bian",
+      "slug": "Bidean-nam-Bian",
+      "h": 1149,
+      "lat": 56.64276,
+      "lon": -5.02933,
+      "area": "west-highlands"
+    },
+    {
+      "name": "Ben Alder",
+      "slug": "Ben-Alder",
+      "h": 1148,
+      "lat": 56.8138,
+      "lon": -4.46509,
+      "area": "west-highlands"
+    },
+    {
+      "name": "Ben Lui",
+      "slug": "Ben-Lui",
+      "h": 1131,
+      "lat": 56.397,
+      "lon": -4.81051,
+      "area": "southeastern-highlands"
+    },
+    {
+      "name": "Geal-charn",
+      "slug": "Geal-charn",
+      "h": 1131,
+      "lat": 56.83783,
+      "lon": -4.50969,
+      "area": "west-highlands"
+    },
+    {
+      "name": "Binnein Mor",
+      "slug": "Binnein-Mor",
+      "h": 1129,
+      "lat": 56.75438,
+      "lon": -4.92581,
+      "area": "west-highlands"
+    },
+    {
+      "name": "Creag Meagaidh",
+      "slug": "Creag-Meagaidh",
+      "h": 1128,
+      "lat": 56.95202,
+      "lon": -4.60212,
+      "area": "cairngorms"
+    },
+    {
+      "name": "An Riabhachan",
+      "slug": "An-Riabhachan",
+      "h": 1128,
+      "lat": 57.36244,
+      "lon": -5.10475,
+      "area": "northwest-highlands"
+    },
+    {
+      "name": "Ben Cruachan",
+      "slug": "Ben-Cruachan",
+      "h": 1127,
+      "lat": 56.42684,
+      "lon": -5.1318,
+      "area": "west-highlands"
+    },
+    {
+      "name": "Meall Garbh",
+      "slug": "Meall-Garbh",
+      "h": 1123,
+      "lat": 56.56613,
+      "lon": -4.2077,
+      "area": "southeastern-highlands"
+    },
+    {
+      "name": "Beinn a Ghlo - Carn nan Gabhar",
+      "slug": "Beinn-a-Ghlo-Carn-nan-Gabhar",
+      "h": 1122,
+      "lat": 56.83985,
+      "lon": -3.68802,
+      "area": "cairngorms"
+    },
+    {
+      "name": "A Chraileag",
+      "slug": "A-Chraileag",
+      "h": 1119,
+      "lat": 57.18424,
+      "lon": -5.15486,
+      "area": "northwest-highlands"
+    },
+    {
+      "name": "An Stuc",
+      "slug": "An-Stuc",
+      "h": 1117,
+      "lat": 56.56008,
+      "lon": -4.21625,
+      "area": "southeastern-highlands"
+    },
+    {
+      "name": "Stob Coire an Laoigh",
+      "slug": "Stob-Coire-an-Laoigh",
+      "h": 1117,
+      "lat": 56.81088,
+      "lon": -4.88489,
+      "area": "west-highlands"
+    },
+    {
+      "name": "Sgor Gaoith",
+      "slug": "Sgor-Gaoith",
+      "h": 1116,
+      "lat": 57.06855,
+      "lon": -3.81086,
+      "area": "cairngorms"
+    },
+    {
+      "name": "Aonach Beag",
+      "slug": "Aonach-Beag",
+      "h": 1116,
+      "lat": 56.8335,
+      "lon": -4.52918,
+      "area": "west-highlands"
+    },
+    {
+      "name": "Stob Coire Easain",
+      "slug": "Stob-Coire-Easain",
+      "h": 1115,
+      "lat": 56.8182,
+      "lon": -4.77371,
+      "area": "west-highlands"
+    },
+    {
+      "name": "Monadh Mor",
+      "slug": "Monadh-Mor",
+      "h": 1113,
+      "lat": 57.0268,
+      "lon": -3.75007,
+      "area": "cairngorms"
+    },
+    {
+      "name": "Tom a Choinnich",
+      "slug": "Tom-a-Choinnich",
+      "h": 1113,
+      "lat": 57.29955,
+      "lon": -5.04896,
+      "area": "northwest-highlands"
+    },
+    {
+      "name": "Carn a Choire Bhoidheach",
+      "slug": "Carn-a-Choire-Bhoidheach",
+      "h": 1110,
+      "lat": 56.94577,
+      "lon": -3.27271,
+      "area": "cairngorms"
+    },
+    {
+      "name": "Sgurr nan Conbhairean",
+      "slug": "Sgurr-nan-Conbhairean",
+      "h": 1109,
+      "lat": 57.17762,
+      "lon": -5.09541,
+      "area": "northwest-highlands"
+    },
+    {
+      "name": "Sgurr Mor",
+      "slug": "Sgurr-Mor",
+      "h": 1109,
+      "lat": 57.70013,
+      "lon": -5.01677,
+      "area": "northwest-highlands"
+    },
+    {
+      "name": "Meall a Bhuiridh",
+      "slug": "Meall-a-Bhuiridh",
+      "h": 1108,
+      "lat": 56.61222,
+      "lon": -4.85216,
+      "area": "west-highlands"
+    },
+    {
+      "name": "Stob a Choire Mheadhoin",
+      "slug": "Stob-a-Choire-Mheadhoin",
+      "h": 1105,
+      "lat": 56.82368,
+      "lon": -4.7602,
+      "area": "west-highlands"
+    },
+    {
+      "name": "Beinn Ghlas",
+      "slug": "Beinn-Ghlas",
+      "h": 1103,
+      "lat": 56.536,
+      "lon": -4.23699,
+      "area": "southeastern-highlands"
+    },
+    {
+      "name": "Beinn Eibhinn",
+      "slug": "Beinn-Eibhinn",
+      "h": 1103,
+      "lat": 56.82525,
+      "lon": -4.54208,
+      "area": "west-highlands"
+    },
+    {
+      "name": "Mullach Fraoch-choire",
+      "slug": "Mullach-Fraoch-choire",
+      "h": 1101,
+      "lat": 57.20539,
+      "lon": -5.15564,
+      "area": "northwest-highlands"
+    },
+    {
+      "name": "Creise",
+      "slug": "Creise",
+      "h": 1100,
+      "lat": 56.61445,
+      "lon": -4.87199,
+      "area": "west-highlands"
+    },
+    {
+      "name": "Sgurr a Mhaim",
+      "slug": "Sgurr-a-Mhaim",
+      "h": 1099,
+      "lat": 56.75592,
+      "lon": -5.00369,
+      "area": "west-highlands"
+    },
+    {
+      "name": "Sgurr Choinnich Mor",
+      "slug": "Sgurr-Choinnich-Mor",
+      "h": 1094,
+      "lat": 56.80044,
+      "lon": -4.90396,
+      "area": "west-highlands"
+    },
+    {
+      "name": "Sgurr nan Clach Geala",
+      "slug": "Sgurr-nan-Clach-Geala",
+      "h": 1093,
+      "lat": 57.69629,
+      "lon": -5.04824,
+      "area": "northwest-highlands"
+    },
+    {
+      "name": "Bynack More",
+      "slug": "Bynack-More",
+      "h": 1090,
+      "lat": 57.13822,
+      "lon": -3.58473,
+      "area": "cairngorms"
+    },
+    {
+      "name": "Stob Ghabhar",
+      "slug": "Stob-Ghabhar",
+      "h": 1089,
+      "lat": 56.5681,
+      "lon": -4.8821,
+      "area": "west-highlands"
+    },
+    {
+      "name": "Beinn a Chlachair",
+      "slug": "Beinn-a-Chlachair",
+      "h": 1088,
+      "lat": 56.86953,
+      "lon": -4.50967,
+      "area": "west-highlands"
+    },
+    {
+      "name": "Beinn Dearg",
+      "slug": "Beinn-Dearg",
+      "h": 1084,
+      "lat": 57.78635,
+      "lon": -4.92956,
+      "area": "northwest-highlands"
+    },
+    {
+      "name": "Sgurr a Choire Ghlais",
+      "slug": "Sgurr-a-Choire-Ghlais",
+      "h": 1084,
+      "lat": 57.44429,
+      "lon": -4.90374,
+      "area": "northwest-highlands"
+    },
+    {
+      "name": "Schiehallion",
+      "slug": "Schiehallion",
+      "h": 1083,
+      "lat": 56.66694,
+      "lon": -4.10023,
+      "area": "southeastern-highlands"
+    },
+    {
+      "name": "Beinn a Chaorainn",
+      "slug": "Beinn-a-Chaorainn",
+      "h": 1083,
+      "lat": 57.09326,
+      "lon": -3.57743,
+      "area": "cairngorms"
+    },
+    {
+      "name": "Beinn a Chreachain",
+      "slug": "Beinn-a-Chreachain",
+      "h": 1081,
+      "lat": 56.56039,
+      "lon": -4.64757,
+      "area": "southeastern-highlands"
+    },
+    {
+      "name": "Ben Starav",
+      "slug": "Ben-Starav",
+      "h": 1080,
+      "lat": 56.53893,
+      "lon": -5.04978,
+      "area": "west-highlands"
+    },
+    {
+      "name": "Beinn Sheasgarnaich",
+      "slug": "Beinn-Sheasgarnaich",
+      "h": 1077,
+      "lat": 56.51025,
+      "lon": -4.57922,
+      "area": "southeastern-highlands"
+    },
+    {
+      "name": "Beinn Dorain",
+      "slug": "Beinn-Dorain",
+      "h": 1076,
+      "lat": 56.50287,
+      "lon": -4.72217,
+      "area": "southeastern-highlands"
+    },
+    {
+      "name": "Stob Coire Sgreamhach",
+      "slug": "Stob-Coire-Sgreamhach",
+      "h": 1072,
+      "lat": 56.63831,
+      "lon": -5.01028,
+      "area": "west-highlands"
+    },
+    {
+      "name": "Beinn a Ghlo - Braigh Coire Chruinn-bhalgain",
+      "slug": "Beinn-a-Ghlo-Braigh-Coire-Chruinn-bhalgain",
+      "h": 1070,
+      "lat": 56.8311,
+      "lon": -3.72949,
+      "area": "cairngorms"
+    },
+    {
+      "name": "An Socach",
+      "slug": "An-Socach",
+      "h": 1070,
+      "lat": 57.35022,
+      "lon": -5.1586,
+      "area": "northwest-highlands"
+    },
+    {
+      "name": "Sgurr Fhuaran",
+      "slug": "Sgurr-Fhuaran",
+      "h": 1069,
+      "lat": 57.19615,
+      "lon": -5.34765,
+      "area": "northwest-highlands"
+    },
+    {
+      "name": "Glas Maol",
+      "slug": "Glas-Maol",
+      "h": 1068,
+      "lat": 56.87307,
+      "lon": -3.36824,
+      "area": "cairngorms"
+    },
+    {
+      "name": "Meall Corranaich",
+      "slug": "Meall-Corranaich",
+      "h": 1067,
+      "lat": 56.54095,
+      "lon": -4.25347,
+      "area": "southeastern-highlands"
+    },
+    {
+      "name": "Snowdon - Yr Wyddfa",
+      "slug": "Snowdon",
+      "h": 1085,
+      "lat": 53.0685,
+      "lon": -4.07623,
+      "area": "snowdonia"
+    },
+    {
+      "name": "Crib y Ddysgl",
+      "slug": "Crib-y-Ddysgl",
+      "h": 1065,
+      "lat": 53.07552,
+      "lon": -4.07518,
+      "area": "snowdonia"
+    },
+    {
+      "name": "Carnedd Llewelyn",
+      "slug": "Carnedd-Llewelyn",
+      "h": 1062,
+      "lat": 53.16017,
+      "lon": -3.97033,
+      "area": "snowdonia"
+    },
+    {
+      "name": "Carnedd Dafydd",
+      "slug": "Carnedd-Dafydd",
+      "h": 1044,
+      "lat": 53.14774,
+      "lon": -4.00084,
+      "area": "snowdonia"
+    },
+    {
+      "name": "Glyder Fawr",
+      "slug": "Glyder-Fawr",
+      "h": 1001,
+      "lat": 53.10147,
+      "lon": -4.02916,
+      "area": "snowdonia"
+    },
+    {
+      "name": "Glyder Fach",
+      "slug": "Glyder-Fach",
+      "h": 994,
+      "lat": 53.10482,
+      "lon": -4.00841,
+      "area": "snowdonia"
+    },
+    {
+      "name": "Pen yr Ole Wen",
+      "slug": "Pen-yr-Ole-Wen",
+      "h": 978,
+      "lat": 53.13766,
+      "lon": -4.01064,
+      "area": "snowdonia"
+    },
+    {
+      "name": "Scafell Pike",
+      "slug": "Scafell-Pike",
+      "h": 978,
+      "lat": 54.45426,
+      "lon": -3.21168,
+      "area": "lake-district"
+    },
+    {
+      "name": "Foel Grach",
+      "slug": "Foel-Grach",
+      "h": 975,
+      "lat": 53.17408,
+      "lon": -3.96323,
+      "area": "snowdonia"
+    },
+    {
+      "name": "Scafell",
+      "slug": "Scafell",
+      "h": 964,
+      "lat": 54.4475,
+      "lon": -3.22473,
+      "area": "lake-district"
+    },
+    {
+      "name": "Yr Elen",
+      "slug": "Yr-Elen",
+      "h": 963,
+      "lat": 53.1666,
+      "lon": -3.98523,
+      "area": "snowdonia"
+    },
+    {
+      "name": "Helvellyn",
+      "slug": "Helvellyn",
+      "h": 950,
+      "lat": 54.527,
+      "lon": -3.01751,
+      "area": "lake-district"
+    },
+    {
+      "name": "Y Garn",
+      "slug": "Y-Garn",
+      "h": 946,
+      "lat": 53.11568,
+      "lon": -4.04708,
+      "area": "snowdonia"
+    },
+    {
+      "name": "Foel-fras",
+      "slug": "Foel-fras",
+      "h": 944,
+      "lat": 53.19416,
+      "lon": -3.95315,
+      "area": "snowdonia"
+    },
+    {
+      "name": "Broad Crag",
+      "slug": "Broad-Crag",
+      "h": 935,
+      "lat": 54.45735,
+      "lon": -3.2069,
+      "area": "lake-district"
+    },
+    {
+      "name": "Ill Crag",
+      "slug": "Ill-Crag",
+      "h": 931,
+      "lat": 54.45558,
+      "lon": -3.1997,
+      "area": "lake-district"
+    },
+    {
+      "name": "Skiddaw",
+      "slug": "Skiddaw",
+      "h": 930,
+      "lat": 54.65139,
+      "lon": -3.14776,
+      "area": "lake-district"
+    },
+    {
+      "name": "Garnedd Uchaf",
+      "slug": "Garnedd-Uchaf",
+      "h": 925,
+      "lat": 53.18298,
+      "lon": -3.96633,
+      "area": "snowdonia"
+    },
+    {
+      "name": "Elidir Fawr",
+      "slug": "Elidir-Fawr",
+      "h": 924,
+      "lat": 53.13065,
+      "lon": -4.07643,
+      "area": "snowdonia"
+    },
+    {
+      "name": "Crib Goch",
+      "slug": "Crib-Goch",
+      "h": 924,
+      "lat": 53.07614,
+      "lon": -4.05519,
+      "area": "snowdonia"
+    },
+    {
+      "name": "Tryfan",
+      "slug": "Tryfan",
+      "h": 918,
+      "lat": 53.1149,
+      "lon": -3.99749,
+      "area": "snowdonia"
+    },
+    {
+      "name": "Great End",
+      "slug": "Great-End",
+      "h": 910,
+      "lat": 54.46494,
+      "lon": -3.19455,
+      "area": "lake-district"
+    },
+    {
+      "name": "Aran Fawddwy",
+      "slug": "Aran-Fawddwy",
+      "h": 906,
+      "lat": 52.78702,
+      "lon": -3.68785,
+      "area": "snowdonia"
+    },
+    {
+      "name": "Bowfell",
+      "slug": "Bowfell",
+      "h": 903,
+      "lat": 54.44782,
+      "lon": -3.16624,
+      "area": "lake-district"
+    },
+    {
+      "name": "Great Gable",
+      "slug": "Great-Gable",
+      "h": 899,
+      "lat": 54.48208,
+      "lon": -3.2193,
+      "area": "lake-district"
+    },
+    {
+      "name": "Y Lliwedd",
+      "slug": "Y-Lliwedd",
+      "h": 898,
+      "lat": 53.05948,
+      "lon": -4.05705,
+      "area": "snowdonia"
+    },
+    {
+      "name": "Cross Fell",
+      "slug": "Cross-Fell",
+      "h": 893,
+      "lat": 54.70295,
+      "lon": -2.48669,
+      "area": "yorkshire-dales"
+    },
+    {
+      "name": "Cadair Idris - Penygadair",
+      "slug": "Cadair-Idris-Penygadair",
+      "h": 893,
+      "lat": 52.69962,
+      "lon": -3.90878,
+      "area": "snowdonia"
+    },
+    {
+      "name": "Pillar",
+      "slug": "Pillar",
+      "h": 892,
+      "lat": 54.49748,
+      "lon": -3.28113,
+      "area": "lake-district"
+    },
+    {
+      "name": "Catstye Cam",
+      "slug": "Catstye-Cam",
+      "h": 890,
+      "lat": 54.53347,
+      "lon": -3.00894,
+      "area": "lake-district"
+    }
+  ]
+}

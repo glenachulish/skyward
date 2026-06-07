@@ -1,0 +1,15 @@
+{
+  "_comment": "MWIS forecast areas with their real URL slugs and region paths (verified against mwis.org.uk). 'slug' + 'region' build the forecast URL: https://www.mwis.org.uk/forecasts/{region}/{slug}. Coords are approximate area centroids for map focus. Attribution: MWIS, https://www.mwis.org.uk/",
+  "areas": [
+    { "id": "northwest-highlands", "name": "The Northwest Highlands", "region": "scottish", "slug": "the-northwest-highlands", "lat": 57.50, "lon": -5.20 },
+    { "id": "west-highlands", "name": "West Highlands", "region": "scottish", "slug": "west-highlands", "lat": 56.82, "lon": -5.10 },
+    { "id": "cairngorms", "name": "Cairngorms NP & Monadhliath", "region": "scottish", "slug": "cairngorms-np-and-monadhliath", "lat": 57.08, "lon": -3.67 },
+    { "id": "southeastern-highlands", "name": "Southeastern Highlands", "region": "scottish", "slug": "southeastern-highlands", "lat": 56.62, "lon": -3.90 },
+    { "id": "southern-uplands", "name": "Southern Uplands", "region": "scottish", "slug": "southern-uplands", "lat": 55.30, "lon": -3.40 },
+    { "id": "lake-district", "name": "Lake District", "region": "english-and-welsh", "slug": "lake-district", "lat": 54.46, "lon": -3.10 },
+    { "id": "yorkshire-dales", "name": "Yorkshire Dales & North Pennines", "region": "english-and-welsh", "slug": "yorkshire-dales-and-north-pennines", "lat": 54.30, "lon": -2.15 },
+    { "id": "peak-district", "name": "Peak District", "region": "english-and-welsh", "slug": "peak-district", "lat": 53.35, "lon": -1.82 },
+    { "id": "snowdonia", "name": "Snowdonia (Eryri)", "region": "english-and-welsh", "slug": "snowdonia-national-park", "lat": 53.07, "lon": -3.97 },
+    { "id": "brecon", "name": "Brecon Beacons (Bannau Brycheiniog)", "region": "english-and-welsh", "slug": "brecon-beacons", "lat": 51.88, "lon": -3.44 }
+  ]
+}

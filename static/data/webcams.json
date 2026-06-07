@@ -1,0 +1,55 @@
+{
+  "_comment": "Real mountain webcams sourced from MWIS (mwis.org.uk/information/webcams). Each cam is operated by an independent organisation; 'site' links to that operator (where you can view the live cam), 'thumb' is a direct image URL that updates periodically (may occasionally be offline). Grouped by the closest MWIS forecast area id (see mwis-areas.json). Attribution: MWIS and the named operators.",
+  "groups": [
+    {
+      "area": "west-highlands",
+      "cams": [
+        { "id": "ben-nevis", "name": "Ben Nevis", "note": "From across Loch Linnhe (HD)", "thumb": "http://ah.cdn.licr.co.uk/images/webcams/ben-nevis-and-fort-william-static.jpg", "site": "http://aboutfortwilliam.com/webcams/ben-nevis-and-fort-william" },
+        { "id": "glencoe-mountain", "name": "Glencoe Mountain", "note": "Buachaille Etive Mòr, Glencoe & Meall a' Bhuiridh", "thumb": "https://www.glencoemountain.co.uk/wp-content/themes/glencoe/images/base1200.jpeg", "site": "http://www.glencoemountain.co.uk/webcams.html" }
+      ]
+    },
+    {
+      "area": "cairngorms",
+      "cams": [
+        { "id": "cairngorm", "name": "Cairngorm Mountain", "note": "Loch Morlich, Fiacaill Ridge & more", "thumb": "https://www.cairngormmountain.co.uk/wp-content/uploads/webcams/morlich-full.jpg", "site": "https://www.cairngormmountain.co.uk/live-webcams/" }
+      ]
+    },
+    {
+      "area": "southeastern-highlands",
+      "cams": [
+        { "id": "glenshee", "name": "Glenshee", "note": "Ski Glenshee", "thumb": "http://www.webcam-hd.com/images/ski-scotland_glenshee/zooms/ski-scotland_glenshee1.jpg", "site": "https://www.ski-glenshee.co.uk/Webcam" },
+        { "id": "the-lecht", "name": "The Lecht", "note": "Lecht ski centre", "thumb": "http://www.trinum.com/ibox/ski-scotland/images/the-lecht/the-lecht1.jpg", "site": "https://www.lecht.co.uk/" }
+      ]
+    },
+    {
+      "area": "lake-district",
+      "cams": [
+        { "id": "blencathra", "name": "Blencathra", "note": "KCS Solutions", "thumb": "https://s3.eu-west-2.amazonaws.com/kcs-webcam/camera/blencathra/latest.jpeg", "site": "https://kcssolutions.co.uk/web-cam/blencathra/" },
+        { "id": "great-gable", "name": "Great Gable", "note": "From Wasdale Head Inn", "thumb": null, "site": "https://www.wasdale.com/17.html" },
+        { "id": "keswick", "name": "Keswick cameras", "note": "Several around Keswick", "thumb": null, "site": "https://keswick.net/" }
+      ]
+    },
+    {
+      "area": "yorkshire-dales",
+      "cams": [
+        { "id": "ingleborough", "name": "Ingleborough", "note": "Ingleborough webcam", "thumb": null, "site": "https://www.ingleborough-webcam.co.uk/" }
+      ]
+    },
+    {
+      "area": "peak-district",
+      "cams": [
+        { "id": "cat-and-fiddle", "name": "Cat & Fiddle", "note": "Toward Shining Tor", "thumb": "http://www.maccinfo.com/WebcamCat/Webcamn200.jpg", "site": "http://www.maccinfo.com/WebcamCat/Webcamn200.jpg" },
+        { "id": "edale", "name": "Edale", "note": "Derbyshire Soaring Club", "thumb": null, "site": "https://derbyshiresoaringclub.org.uk/spingycams/" }
+      ]
+    },
+    {
+      "area": "snowdonia",
+      "cams": [
+        { "id": "tryfan", "name": "Tryfan & Y Garn", "note": "West from Bryn Poeth (Ogwen)", "thumb": "https://webcams.ogwen-rescue.org.uk/dlink/ygarn_camera.jpg", "site": "https://ogwen-rescue.org.uk/webcams/" },
+        { "id": "moelfre", "name": "Moelfre, Anglesey", "note": "Snowdon visible 20 miles off", "thumb": "http://www.maccinfo.com/WebcamMoelfre/MoelfreCam.jpg", "site": "http://www.moelfreweathercam.co.uk/" },
+        { "id": "cadair-idris", "name": "Cadair Idris", "note": "From Barmouth", "thumb": "https://files.merionethyachtclub.co.uk/webcam/MYC-Webcam-Bridge.jpg", "site": "https://www.merionethyachtclub.com/web-cams" }
+      ]
+    }
+  ],
+  "more_link": { "name": "Scotland's Mountain Webcams (Steven Fallon)", "url": "http://www.stevenfallon.co.uk/webcams.html" }
+}

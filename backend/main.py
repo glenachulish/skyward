@@ -1,0 +1,326 @@
+"""
+Skyward — mountain weather education app.
+Thin FastAPI backend: serves the static frontend and proxies weather APIs
+(so API keys never reach the browser and CORS is sidestepped).
+
+PREFIX CONTRACT (see PI-INFRASTRUCTURE.md):
+  Tailscale Funnel STRIPS the /skyward prefix before proxying, so from this
+  backend's own perspective it lives at "/". Therefore we do NOT set
+  root_path / --root-path here — that would double the prefix. The backend is
+  deliberately prefix-NAIVE. The browser still sees /skyward/... in the address
+  bar, so the FRONTEND is prefix-AWARE (see static/js/config.js).
+
+Run locally on the Mac:
+  cd backend && uvicorn main:app --reload --port 8005
+Then open http://localhost:8005/
+"""
+from pathlib import Path
+import json
+import re
+import time
+
+import httpx
+from fastapi import FastAPI, HTTPException, Query
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
+
+app = FastAPI(title="Skyward", docs_url="/api/docs")
+
+STATIC_DIR = (Path(__file__).resolve().parent.parent / "static").resolve()
+DATA_DIR = STATIC_DIR / "data"
+
+# --- Weather data source -----------------------------------------------------
+# Phase 1 decision: Open-Meteo now (no key, free), Met Office DataHub later.
+# When DataHub arrives, add a second function and switch on a query param or
+# config flag; the frontend keeps calling /api/weather and never sees the swap.
+OPEN_METEO_URL = "https://api.open-meteo.com/v1/forecast"
+
+
+@app.get("/api/health")
+async def health():
+    """Liveness probe — also the first thing to curl after a Pi deploy."""
+    return {"status": "ok", "app": "skyward"}
+
+
+@app.get("/api/weather")
+async def weather(
+    lat: float = Query(..., ge=-90, le=90),
+    lon: float = Query(..., ge=-180, le=180),
+):
+    """
+    Proxy Open-Meteo for a single point. Returns current conditions plus the
+    hourly and 3-part daily data the progressive panel needs (temperature,
+    wind, precipitation, freezing level).
+    """
+    params = {
+        "latitude": lat,
+        "longitude": lon,
+        "current": ",".join([
+            "temperature_2m",
+            "apparent_temperature",
+            "precipitation",
+            "weather_code",
+            "wind_speed_10m",
+            "wind_gusts_10m",
+            "wind_direction_10m",
+        ]),
+        "hourly": ",".join([
+            "temperature_2m",
+            "precipitation_probability",
+            "precipitation",
+            "weather_code",
+            "wind_speed_10m",
+            "wind_gusts_10m",
+            "wind_direction_10m",
+            "freezing_level_height",
+            "cloud_cover",
+        ]),
+        "daily": ",".join([
+            "weather_code",
+            "temperature_2m_max",
+            "temperature_2m_min",
+            "precipitation_sum",
+            "precipitation_probability_max",
+            "wind_speed_10m_max",
+            "wind_gusts_10m_max",
+        ]),
+        "timezone": "Europe/London",
+        "wind_speed_unit": "mph",
+        "forecast_days": 3,
+    }
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            r = await client.get(OPEN_METEO_URL, params=params)
+            r.raise_for_status()
+            data = r.json()
+    except httpx.TimeoutException:
+        raise HTTPException(status_code=504, detail="Weather service timed out")
+    except httpx.HTTPStatusError as e:
+        raise HTTPException(status_code=502, detail=f"Weather service error: {e.response.status_code}")
+    except httpx.HTTPError:
+        raise HTTPException(status_code=502, detail="Could not reach weather service")
+
+    # Open-Meteo returns over open ocean too, but with nulls in places. Flag the
+    # likely-oceanic case the handover notes call out, so the UI can message it.
+    current = data.get("current", {})
+    if current.get("temperature_2m") is None:
+        return JSONResponse(
+            status_code=200,
+            content={"source": "open-meteo", "oceanic": True, "raw": data,
+                     "attribution": _attribution()},
+        )
+
+    return {"source": "open-meteo", "oceanic": False, "raw": data,
+            "attribution": _attribution()}
+
+
+def _attribution() -> dict:
+    """Every data response carries its source + URL (a core app requirement)."""
+    return {
+        "name": "Open-Meteo",
+        "url": "https://open-meteo.com/",
+        "licence": "CC BY 4.0",
+    }
+
+
+# --- MWIS area forecasts ------------------------------------------------------
+# MWIS (mwis.org.uk) publishes daily 3-day mountain forecasts as HTML pages
+# heavy with adverts. The brief asks for these "without all the adverts and
+# distractions". We fetch the page server-side, extract the structured forecast
+# sections, and let the frontend render them clean. Attribution + a link back
+# to MWIS is always included to drive traffic to the source.
+#
+# Respectful use: results are cached in-process for an hour (forecasts update a
+# few times a day, so this is plenty fresh and avoids hammering their server).
+# Parsing targets stable section HEADINGS, not page layout, and degrades
+# gracefully — if extraction yields nothing, the frontend falls back to opening
+# the real MWIS page in the in-app browser.
+
+MWIS_BASE = "https://www.mwis.org.uk/forecasts"
+_mwis_cache: dict[str, tuple[float, dict]] = {}
+_MWIS_TTL = 3600  # seconds
+
+# The labelled sections MWIS uses per day, in display order.
+_MWIS_FIELDS = [
+    "How windy? (On the Munros)",
+    "Effect of the wind on you?",
+    "How Wet?",
+    "Cloud on the hills?",
+    "Chance of cloud free Munros?",
+    "Sunshine and air clarity?",
+    "How Cold? (at 900m)",
+    "Freezing Level",
+]
+
+
+def _load_areas() -> list[dict]:
+    return json.loads((DATA_DIR / "mwis-areas.json").read_text()).get("areas", [])
+
+
+def _parse_mwis(md: str) -> dict:
+    """
+    Extract the clean forecast from MWIS page text (the fetcher returns the page
+    as markdown-ish text). We pull: the all-areas summary, the area headline,
+    a per-day list of labelled sections, and the planning outlook.
+
+    The page repeats '#### <Label>' headings followed by their text. Days are
+    delimited by '#### Viewing Forecast For' blocks naming the date.
+    """
+    def section_after(label: str, text: str) -> str | None:
+        # Grab the paragraph(s) following a '#### Label' until the next '#### ' / '###'.
+        pat = re.compile(
+            r"####\s+" + re.escape(label) + r"\s*\n+(.*?)(?=\n#{3,4}\s|\Z)",
+            re.S,
+        )
+        m = pat.search(text)
+        if not m:
+            return None
+        # Clean: drop bold markers, collapse whitespace, strip stray markdown.
+        chunk = m.group(1)
+        chunk = re.sub(r"\*\*(.*?)\*\*", r"\1", chunk)        # bold -> plain
+        chunk = re.sub(r"[ \t]+", " ", chunk)
+        chunk = "\n".join(line.strip() for line in chunk.splitlines())
+        return chunk.strip() or None
+
+    summary = section_after("Summary for all mountain areas", md)
+    headline = None
+    hm = re.search(r"####\s+Headline for .*?\n+(.*?)(?=\n#{3,4}\s|\Z)", md, re.S)
+    if hm:
+        headline = re.sub(r"[ \t]+", " ", hm.group(1)).strip()
+
+    # Split into day blocks on "Viewing Forecast For".
+    day_blocks = re.split(r"####\s+Viewing Forecast For", md)
+    days = []
+    for block in day_blocks[1:]:
+        # First bold lines carry the area + date.
+        date_m = re.search(r"\*\*(.*?)\*\*\s*\n+\*\*(.*?)\*\*", block)
+        date = date_m.group(2).strip() if date_m else None
+        fields = []
+        for label in _MWIS_FIELDS:
+            val = section_after(label, block)
+            if val:
+                # Tidy the label for display (drop the parenthetical qualifiers).
+                disp = re.sub(r"\s*\(.*?\)\s*$", "", label)
+                fields.append({"label": disp, "text": val})
+        if fields:
+            days.append({"date": date, "fields": fields})
+
+    outlook = section_after("Planning Outlook", md) or _planning_outlook(md)
+
+    return {
+        "summary": summary,
+        "headline": headline,
+        "days": days,
+        "outlook": outlook,
+    }
+
+
+def _planning_outlook(md: str) -> str | None:
+    m = re.search(r"###\s+Planning Outlook\s*\n+(.*?)(?=\n#{3,6}\s|\Z)", md, re.S)
+    if not m:
+        return None
+    return re.sub(r"[ \t]+", " ", m.group(1)).strip() or None
+
+
+@app.get("/api/mwis")
+async def mwis(area: str = Query(..., min_length=2, max_length=64)):
+    """
+    Return a cleaned MWIS forecast for one area id (see mwis-areas.json).
+    Falls back with `parsed: false` + the source URL if extraction fails, so
+    the frontend can offer the in-app browser instead of showing nothing.
+    """
+    areas = _load_areas()
+    meta = next((a for a in areas if a["id"] == area), None)
+    if not meta:
+        raise HTTPException(status_code=404, detail="Unknown MWIS area")
+
+    source_url = f"{MWIS_BASE}/{meta['region']}/{meta['slug']}"
+    attribution = {
+        "name": "Mountain Weather Information Service (MWIS)",
+        "url": source_url,
+        "licence": "© MWIS — used with attribution; visit the source.",
+    }
+
+    # Serve from cache if fresh.
+    now = time.time()
+    cached = _mwis_cache.get(area)
+    if cached and now - cached[0] < _MWIS_TTL:
+        return cached[1]
+
+    try:
+        async with httpx.AsyncClient(timeout=12.0, follow_redirects=True,
+                                     headers={"User-Agent": "Skyward/1.0 (personal mountain weather app)"}) as client:
+            r = await client.get(source_url)
+            r.raise_for_status()
+            html = r.text
+    except httpx.HTTPError:
+        # Network/HTTP failure: tell the frontend to fall back to the live page.
+        return {"area": meta["name"], "parsed": False,
+                "source_url": source_url, "attribution": attribution,
+                "error": "Could not reach MWIS"}
+
+    # The fetcher in production returns HTML; strip tags to the text the parser
+    # expects. (We keep heading markers by converting <h3>/<h4> to ###/####.)
+    text = _html_to_text(html)
+    parsed = _parse_mwis(text)
+    ok = bool(parsed["days"] or parsed["summary"] or parsed["headline"])
+
+    payload = {
+        "area": meta["name"],
+        "parsed": ok,
+        "forecast": parsed if ok else None,
+        "source_url": source_url,
+        "attribution": attribution,
+    }
+    if ok:
+        _mwis_cache[area] = (now, payload)
+    return payload
+
+
+def _html_to_text(html: str) -> str:
+    """
+    Minimal HTML -> heading-aware text. We don't pull in BeautifulSoup to keep
+    the dependency list tiny; MWIS markup is simple and stable enough for a
+    targeted conversion. Converts h3/h4 to ###/#### and <strong> to **..**, then
+    strips remaining tags.
+    """
+    s = html
+    s = re.sub(r"<\s*h4[^>]*>", "\n#### ", s, flags=re.I)
+    s = re.sub(r"<\s*h3[^>]*>", "\n### ", s, flags=re.I)
+    s = re.sub(r"<\s*/\s*h[34]\s*>", "\n", s, flags=re.I)
+    s = re.sub(r"<\s*(strong|b)\s*>", "**", s, flags=re.I)
+    s = re.sub(r"<\s*/\s*(strong|b)\s*>", "**", s, flags=re.I)
+    s = re.sub(r"<\s*br\s*/?\s*>", "\n", s, flags=re.I)
+    s = re.sub(r"<\s*/\s*p\s*>", "\n", s, flags=re.I)
+    s = re.sub(r"<script.*?</script>", "", s, flags=re.I | re.S)
+    s = re.sub(r"<style.*?</style>", "", s, flags=re.I | re.S)
+    s = re.sub(r"<[^>]+>", "", s)            # strip remaining tags
+    s = re.sub(r"&amp;", "&", s)
+    s = re.sub(r"&nbsp;", " ", s)
+    s = re.sub(r"&#39;|&rsquo;|&lsquo;", "'", s)
+    s = re.sub(r"&deg;", "°", s)
+    s = re.sub(r"\n{3,}", "\n\n", s)
+    return s
+
+
+# --- Static frontend ----------------------------------------------------------
+# Assets live under /static/... (matching the relative paths the HTML emits:
+# "static/css/app.css" etc). The backend is prefix-naive, so these are real
+# absolute paths from its own perspective; Tailscale adds /skyward in front.
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
+INDEX = STATIC_DIR / "index.html"
+
+
+@app.get("/")
+async def root():
+    return FileResponse(str(INDEX))
+
+
+@app.get("/{full_path:path}")
+async def spa_fallback(full_path: str):
+    """SPA fallback: unknown non-API, non-static paths return index.html so
+    client routing (e.g. /webcams, /library) survives a refresh."""
+    if full_path.startswith("api/") or full_path.startswith("static/"):
+        raise HTTPException(status_code=404, detail="Not found")
+    return FileResponse(str(INDEX))

@@ -1,0 +1,370 @@
+{
+  "_comment": "~40 of Scotland’s best smaller mountains (non-Munro Corbetts & Grahams), curated by topographic prominence from the Database of British & Irish Hills. In the spirit of Cicerone’s “Scotland’s Best Small Mountains”. Verified coordinates. slug -> https://www.mountain-forecast.com/peaks/{slug}.",
+  "source_base": "https://www.mountain-forecast.com/peaks",
+  "attribution": {
+    "coords": "Database of British & Irish Hills",
+    "forecast": "mountain-forecast.com (Meteo365 Ltd)"
+  },
+  "peaks": [
+    {
+      "name": "Foinaven",
+      "slug": "Foinaven",
+      "h": 911,
+      "lat": 58.41206,
+      "lon": -4.8857,
+      "area": "northwest-highlands",
+      "cls": "corbett"
+    },
+    {
+      "name": "Beinn an Lochain",
+      "slug": "Beinn-an-Lochain",
+      "h": 902,
+      "lat": 56.23009,
+      "lon": -4.87623,
+      "area": "west-highlands",
+      "cls": "corbett"
+    },
+    {
+      "name": "Sgurr nan Eugallt",
+      "slug": "Sgurr-nan-Eugallt",
+      "h": 898,
+      "lat": 57.08796,
+      "lon": -5.42264,
+      "area": "west-highlands",
+      "cls": "corbett"
+    },
+    {
+      "name": "Beinn Bhan",
+      "slug": "Beinn-Bhan",
+      "h": 896,
+      "lat": 57.44235,
+      "lon": -5.6617,
+      "area": "northwest-highlands",
+      "cls": "corbett"
+    },
+    {
+      "name": "Sgurr Dhomhnuill",
+      "slug": "Sgurr-Dhomhnuill",
+      "h": 888,
+      "lat": 56.75466,
+      "lon": -5.45377,
+      "area": "west-highlands",
+      "cls": "corbett"
+    },
+    {
+      "name": "The Cobbler",
+      "slug": "The-Cobbler",
+      "h": 887,
+      "lat": 56.21301,
+      "lon": -4.80802,
+      "area": "southeastern-highlands",
+      "cls": "corbett"
+    },
+    {
+      "name": "Garbh Bheinn",
+      "slug": "Garbh-Bheinn",
+      "h": 886,
+      "lat": 56.70445,
+      "lon": -5.42501,
+      "area": "west-highlands",
+      "cls": "corbett"
+    },
+    {
+      "name": "Beinn Odhar Bheag",
+      "slug": "Beinn-Odhar-Bheag",
+      "h": 883,
+      "lat": 56.8422,
+      "lon": -5.53239,
+      "area": "west-highlands",
+      "cls": "corbett"
+    },
+    {
+      "name": "Ben Ledi",
+      "slug": "Ben-Ledi",
+      "h": 879,
+      "lat": 56.25866,
+      "lon": -4.32238,
+      "area": "southeastern-highlands",
+      "cls": "corbett"
+    },
+    {
+      "name": "Sgurr a Mhuilinn",
+      "slug": "Sgurr-a-Mhuilinn",
+      "h": 879,
+      "lat": 57.55838,
+      "lon": -4.9023,
+      "area": "northwest-highlands",
+      "cls": "corbett"
+    },
+    {
+      "name": "Goatfell",
+      "slug": "Goatfell",
+      "h": 875,
+      "lat": 55.62583,
+      "lon": -5.19188,
+      "area": "west-highlands",
+      "cls": "corbett"
+    },
+    {
+      "name": "Ben Hee",
+      "slug": "Ben-Hee",
+      "h": 873,
+      "lat": 58.26589,
+      "lon": -4.68391,
+      "area": "northwest-highlands",
+      "cls": "corbett"
+    },
+    {
+      "name": "Creach Bheinn",
+      "slug": "Creach-Bheinn",
+      "h": 853,
+      "lat": 56.66198,
+      "lon": -5.4762,
+      "area": "west-highlands",
+      "cls": "corbett"
+    },
+    {
+      "name": "Cul Mor",
+      "slug": "Cul-Mor",
+      "h": 850,
+      "lat": 58.05812,
+      "lon": -5.11677,
+      "area": "northwest-highlands",
+      "cls": "corbett"
+    },
+    {
+      "name": "Sgurr Ghiubhsachain",
+      "slug": "Sgurr-Ghiubhsachain",
+      "h": 849,
+      "lat": 56.81895,
+      "lon": -5.48256,
+      "area": "west-highlands",
+      "cls": "corbett"
+    },
+    {
+      "name": "Canisp",
+      "slug": "Canisp",
+      "h": 848,
+      "lat": 58.12091,
+      "lon": -5.05285,
+      "area": "northwest-highlands",
+      "cls": "corbett"
+    },
+    {
+      "name": "Merrick",
+      "slug": "Merrick",
+      "h": 843,
+      "lat": 55.13927,
+      "lon": -4.46841,
+      "area": "west-highlands",
+      "cls": "corbett"
+    },
+    {
+      "name": "Broad Law",
+      "slug": "Broad-Law",
+      "h": 840,
+      "lat": 55.49813,
+      "lon": -3.35273,
+      "area": "west-highlands",
+      "cls": "corbett"
+    },
+    {
+      "name": "Carn Mor",
+      "slug": "Carn-Mor",
+      "h": 830,
+      "lat": 56.96201,
+      "lon": -5.45073,
+      "area": "west-highlands",
+      "cls": "corbett"
+    },
+    {
+      "name": "Askival",
+      "slug": "Askival",
+      "h": 812,
+      "lat": 56.97443,
+      "lon": -6.2915,
+      "area": "west-highlands",
+      "cls": "corbett"
+    },
+    {
+      "name": "Quinag",
+      "slug": "Quinag",
+      "h": 809,
+      "lat": 58.21515,
+      "lon": -5.0499,
+      "area": "northwest-highlands",
+      "cls": "corbett"
+    },
+    {
+      "name": "An Cliseam",
+      "slug": "An-Cliseam",
+      "h": 800,
+      "lat": 57.9639,
+      "lon": -6.81278,
+      "area": "west-highlands",
+      "cls": "corbett"
+    },
+    {
+      "name": "Cairnsmore of Carsphairn",
+      "slug": "Cairnsmore-of-Carsphairn",
+      "h": 797,
+      "lat": 55.2561,
+      "lon": -4.21313,
+      "area": "west-highlands",
+      "cls": "corbett"
+    },
+    {
+      "name": "Beinn Airigh Charr",
+      "slug": "Beinn-Airigh-Charr",
+      "h": 792,
+      "lat": 57.72757,
+      "lon": -5.47761,
+      "area": "northwest-highlands",
+      "cls": "corbett"
+    },
+    {
+      "name": "Arkle",
+      "slug": "Arkle",
+      "h": 786,
+      "lat": 58.37107,
+      "lon": -4.90365,
+      "area": "northwest-highlands",
+      "cls": "corbett"
+    },
+    {
+      "name": "Beinn an Oir",
+      "slug": "Beinn-an-Oir",
+      "h": 785,
+      "lat": 55.9024,
+      "lon": -6.00414,
+      "area": "west-highlands",
+      "cls": "corbett"
+    },
+    {
+      "name": "Cul Beag",
+      "slug": "Cul-Beag",
+      "h": 769,
+      "lat": 58.02956,
+      "lon": -5.15101,
+      "area": "northwest-highlands",
+      "cls": "corbett"
+    },
+    {
+      "name": "Dun da Ghaoithe",
+      "slug": "Dun-da-Ghaoithe",
+      "h": 766,
+      "lat": 56.46044,
+      "lon": -5.77951,
+      "area": "west-highlands",
+      "cls": "corbett"
+    },
+    {
+      "name": "Ben Loyal",
+      "slug": "Ben-Loyal",
+      "h": 764,
+      "lat": 58.40493,
+      "lon": -4.43503,
+      "area": "northwest-highlands",
+      "cls": "corbett"
+    },
+    {
+      "name": "Ben More Coigach",
+      "slug": "Ben-More-Coigach",
+      "h": 743,
+      "lat": 57.98653,
+      "lon": -5.22574,
+      "area": "northwest-highlands",
+      "cls": "graham"
+    },
+    {
+      "name": "Beinn Mhor",
+      "slug": "Beinn-Mhor",
+      "h": 742,
+      "lat": 56.0726,
+      "lon": -5.04164,
+      "area": "west-highlands",
+      "cls": "graham"
+    },
+    {
+      "name": "Sgurr na Coinnich",
+      "slug": "Sgurr-na-Coinnich",
+      "h": 739,
+      "lat": 57.23619,
+      "lon": -5.70941,
+      "area": "west-highlands",
+      "cls": "graham"
+    },
+    {
+      "name": "Doune Hill",
+      "slug": "Doune-Hill",
+      "h": 734,
+      "lat": 56.13585,
+      "lon": -4.75252,
+      "area": "southeastern-highlands",
+      "cls": "graham"
+    },
+    {
+      "name": "Beinn na Caillich",
+      "slug": "Beinn-na-Caillich",
+      "h": 732,
+      "lat": 57.23727,
+      "lon": -5.97668,
+      "area": "west-highlands",
+      "cls": "graham"
+    },
+    {
+      "name": "Suilven",
+      "slug": "Suilven",
+      "h": 731,
+      "lat": 58.11552,
+      "lon": -5.13676,
+      "area": "northwest-highlands",
+      "cls": "graham"
+    },
+    {
+      "name": "Ben Stack",
+      "slug": "Ben-Stack",
+      "h": 721,
+      "lat": 58.33491,
+      "lon": -4.95773,
+      "area": "northwest-highlands",
+      "cls": "graham"
+    },
+    {
+      "name": "Ben Cleuch",
+      "slug": "Ben-Cleuch",
+      "h": 721,
+      "lat": 56.18568,
+      "lon": -3.76949,
+      "area": "west-highlands",
+      "cls": "graham"
+    },
+    {
+      "name": "The Storr",
+      "slug": "The-Storr",
+      "h": 719,
+      "lat": 57.50711,
+      "lon": -6.18311,
+      "area": "west-highlands",
+      "cls": "graham"
+    },
+    {
+      "name": "Tiorga Mor",
+      "slug": "Tiorga-Mor",
+      "h": 680,
+      "lat": 57.99489,
+      "lon": -6.98505,
+      "area": "west-highlands",
+      "cls": "graham"
+    },
+    {
+      "name": "Stac Pollaidh",
+      "slug": "Stac-Pollaidh",
+      "h": 612,
+      "lat": 58.04411,
+      "lon": -5.20852,
+      "area": "northwest-highlands",
+      "cls": "graham"
+    }
+  ]
+}
