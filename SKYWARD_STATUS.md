@@ -1,6 +1,20 @@
 # Skyward — Status
 
-**Updated:** 2026-06-07 (Session 2 — themed, forecasts/webcams/peaks added, DEPLOYED TO PI)
+**Updated:** 2026-06-07 (Session 3 — Voyager basemap, synced to Pi, repo now on GitHub)
+
+## Session 3 changes (this session)
+- **Map labels:** Callum reported tile place-names shrinking on zoom. Diagnosed as
+  inherent Carto tile behaviour (labels are baked into the tile image, not HTML — peak
+  `divIcon` labels were already fixed-size and not the cause). Compared two fixes live
+  (Voyager bolder-label tiles vs. label-free base + our own fixed labels); Callum chose
+  **Voyager**. One-line URL swap in `map.js` (`light_all` → `rastertiles/voyager`).
+- Synced to the Pi by rsync; confirmed `voyager` present on the Pi copy. Frontend-only,
+  so no service restart needed.
+- Initialised git and pushed the whole project to GitHub (first remote — see below).
+- Note for next time: tile labels still re-render per zoom level (unavoidable for any
+  tile basemap); Voyager just draws them more legibly. A genuine "never resizes" option
+  remains available as a hybrid (Voyager base + our own fixed peak labels on top).
+
 
 ## Live deployment
 - **Public URL:** https://ceol-pi.tail01672f.ts.net/skyward/  (LIVE ✅)
@@ -12,9 +26,15 @@
   Verified additive — `/`, `/orain`, `/nature` all preserved and still 200 (Òrain/Nature)
   after the change. Tailscale STRIPS the `/skyward` prefix, so backend stays prefix-naïve;
   frontend is prefix-aware and auto-detects — no code edits at deploy time.
-- **Deploy method:** `rsync` Mac→Pi (no git remote yet). Repeat to update:
+- **GitHub:** repo now live at https://github.com/glenachulish/skyward (`main` tracks
+  `origin/main`). `.gitignore` excludes `.venv/`, `__pycache__/`, `*.key`/`*.crt`/`.env`,
+  drift reports, `.DS_Store` — so a future DataHub key can't be committed. First push
+  needed `--allow-unrelated-histories` (repo had an auto-created file); routine pushes now
+  are just `git add . && git commit -m … && git push`.
+- **Deploy method:** `rsync` Mac→Pi. Repeat to update:
   `rsync -avz --exclude '.venv' --exclude '__pycache__' --exclude '.DS_Store' ~/Skyward/ pi@ceol-pi.local:~/Skyward/`
   then `ssh pi@ceol-pi.local "sudo systemctl restart skyward"` (only needed if backend changed).
+  Standard update loop: commit + push to GitHub, then rsync to the Pi.
 - **End-to-end verified on Pi:** `/api/health` 200; `/api/weather` 200 (live Open-Meteo
   fetch works from the Pi — the real data path, which couldn't be tested in Claude's sandbox).
 
@@ -37,12 +57,13 @@
 
 ### Phase 0 — Foundations ✅ DONE
 - [x] Project structure; prefix constant + `url()` helper (tested both paths + edge cases).
-- [x] Cache-busting `?v=N` (currently v9) on all local assets.
+- [x] Cache-busting `?v=N` (currently v10) on all local assets.
 - [x] CSS/JS in own files. `drift-report.sh` + `drift-compare.sh` (compare tested).
 
 ### Phase 1 — Core map & data ✅ DONE (Open-Meteo)
 - [x] `/api/health`, `/api/weather`; Leaflet full-screen map + centred crosshair
-      (Carto **light** tiles — switched from dark with the theme change).
+      (Carto **Voyager** tiles — `rastertiles/voyager`, switched from `light_all` in
+      Session 3 for bolder, clearer place labels; chosen over a fixed-label approach).
 - [x] "Investigate" fetches weather for map centre; full Open-Meteo set incl. freezing level.
 - [x] Progressive panel: Morning/PM/Night → swipe/tap for hourly.
 - [x] Loading + error + oceanic-coordinate handling. **Live fetch confirmed on the Pi.**

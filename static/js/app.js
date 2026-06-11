@@ -77,6 +77,34 @@
     });
   }
 
+  // --- Text size (accessibility) ------------------------------------------
+  // Scale the ROOT font-size; because almost every size in app.css is in rem,
+  // content type scales proportionally while fixed chrome (icons, crosshair)
+  // stays put. Persisted via the store so it survives reloads, and applied
+  // here on boot so it's correct on every view before anything renders.
+  const FONT_STEPS = [0.9, 1.0, 1.15, 1.3, 1.45];   // 90% … 145%
+  const FONT_DEFAULT_IDX = 1;                        // 100%
+
+  function applyFontScale() {
+    const idx = S.store.get("font-idx", FONT_DEFAULT_IDX);
+    const clamped = Math.max(0, Math.min(FONT_STEPS.length - 1, idx));
+    document.documentElement.style.fontSize = (FONT_STEPS[clamped] * 100) + "%";
+    return clamped;
+  }
+
+  // Public so the map view's A−/A/A+ control can drive it.
+  S.fontScale = {
+    steps: FONT_STEPS,
+    get: () => Math.max(0, Math.min(FONT_STEPS.length - 1, S.store.get("font-idx", FONT_DEFAULT_IDX))),
+    set: (idx) => {
+      const clamped = Math.max(0, Math.min(FONT_STEPS.length - 1, idx));
+      S.store.set("font-idx", clamped);
+      applyFontScale();
+      return clamped;
+    },
+    reset: () => S.fontScale.set(FONT_DEFAULT_IDX),
+  };
+
   // Public helper for contextual "What's This?" jumps from the map.
   S.openLibrary = (module, topic) => go("library", true, { module, topic });
 
@@ -89,6 +117,7 @@
   window.addEventListener("popstate", () => go(routeFromPath(), false));
 
   document.addEventListener("DOMContentLoaded", () => {
+    applyFontScale();
     buildShell();
     go(routeFromPath(), false);
   });

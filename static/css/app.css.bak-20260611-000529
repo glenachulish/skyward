@@ -143,18 +143,14 @@ html, body {
 .fab:active { transform: translateX(-50%) scale(.96); }
 .fab:disabled { opacity: .6; cursor: default; }
 
-/* Map top bar: two rows — controls, then the layer toggles */
+/* Map top bar: area focus + winter toggle */
 .map-topbar {
   position: absolute; top: 12px; left: 12px; right: 12px;
   z-index: 600;
-  display: flex; flex-direction: column; gap: .4rem; align-items: stretch;
-  pointer-events: none;
-}
-.topbar-row {
   display: flex; gap: .4rem; align-items: center; flex-wrap: wrap;
   pointer-events: none;
 }
-.topbar-row > * { pointer-events: auto; }
+.map-topbar > * { pointer-events: auto; }
 .area-select {
   flex: 1 1 140px;
   background: rgba(251,250,246,.94);
@@ -206,25 +202,16 @@ html, body {
 .text-size #font-reset { font-size: .95rem; }
 .text-size #font-up { font-size: 1.1rem; }
 
-/* Segmented group: keeps the layer toggles visually joined even when the bar wraps */
+/* Segmented pair: keeps Peaks + Small visually joined even when the bar wraps */
 .seg { display: inline-flex; align-items: stretch; }
 .seg .winter-toggle { box-shadow: none; }
 .seg .winter-toggle:first-child {
   border-top-right-radius: 0; border-bottom-right-radius: 0; border-right: none;
 }
-.seg .winter-toggle:not(:first-child):not(:last-child) {
-  border-radius: 0; border-right: none;
-}
 .seg .winter-toggle:last-child {
   border-top-left-radius: 0; border-bottom-left-radius: 0;
 }
 .seg { box-shadow: var(--shadow); border-radius: var(--radius-sm); }
-
-/* Topbar zoom buttons (replace Leaflet's corner +/− control) */
-.zoom-ctl button {
-  font-size: .78rem; letter-spacing: .05em; text-transform: uppercase;
-  padding: .5rem .65rem;
-}
 
 /* ===================== DATA PANEL (slide-up sheet) ======================= */
 #sheet {
@@ -465,14 +452,6 @@ body.winter .peak-dot { background: var(--accent); }
 }
 .small-pin .peak-label { color: var(--accent2); }
 
-/* Crags (UKC, year-round): warm rock-brown diamond */
-.crag-pin .peak-dot {
-  background: #8a5a3c; border: 1.5px solid #fff;
-  width: 8px; height: 8px; border-radius: 2px;
-  transform: rotate(45deg);
-}
-.crag-pin .peak-label { color: #8a5a3c; }
-
 /* ============================ BOTTOM NAV ================================= */
 #nav {
   flex: 0 0 var(--nav-h);
@@ -550,22 +529,8 @@ body.winter .module-head .num { color: #fff; }
 }
 #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-/* Wide screens (Mac, tablet landscape): use the full window. The map goes
-   edge-to-edge; the reading views (Forecast/Webcams/Library) keep a
-   comfortable measure by centring their content; the bottom sheet becomes a
-   centred panel rather than a wall-to-wall strip. Everything is rem-based,
-   so the A−/A+ text-size control scales the measure too. */
 @media (min-width: 720px) {
-  .scroll-view {
-    padding-left:  max(1.2rem, calc((100% - 64rem) / 2));
-    padding-right: max(1.2rem, calc((100% - 64rem) / 2));
-  }
-  #sheet {
-    max-width: 40rem;
-    margin: 0 auto;
-    border-left: 1px solid var(--line);
-    border-right: 1px solid var(--line);
-  }
+  #app { max-width: 480px; margin: 0 auto; border-left: 1px solid var(--line); border-right: 1px solid var(--line); }
 }
 /* ===========================================================================
    SAIS avalanche overlay (Phase 5a) — APPEND THIS BLOCK TO static/css/app.css
@@ -636,24 +601,3 @@ body.winter .module-head .num { color: #fff; }
 
 /* fix: let the SAIS banner take its natural width */
 .sais-banner { width: max-content; }
-
-
-/* ===========================================================================
-   My Pins (Session 5b) — add your own peak/hill/crag from inside the app
-   ======================================================================== */
-.pin-form { display: flex; flex-direction: column; gap: .8rem; align-items: flex-start; }
-.pin-form input {
-  width: 100%;
-  font: inherit; font-size: 1rem;
-  color: var(--ink);
-  background: var(--bg-raised, #fbfaf6);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  padding: .6rem .75rem;
-}
-.pin-form input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
-.pin-form .fab-inline { align-self: stretch; text-align: center; }
-
-/* A pin the user added: same family as its layer, with a dashed halo ring */
-.custom-pin .peak-dot { outline: 2px dashed currentColor; outline-offset: 2px; }
-.custom-pin .peak-label { font-style: italic; }

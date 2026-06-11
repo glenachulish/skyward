@@ -15,38 +15,27 @@
       <div id="map"></div>
       <div id="crosshair"><div class="ring"></div></div>
       <div class="map-topbar">
-        <div class="topbar-row">
-          <select class="area-select" id="area-select" aria-label="Jump to forecast area">
-            <option value="">Jump to area…</option>
-          </select>
-          <div class="text-size" role="group" aria-label="Text size">
-            <button id="font-down" aria-label="Smaller text">A−</button>
-            <button id="font-reset" aria-label="Reset text size">A</button>
-            <button id="font-up" aria-label="Larger text">A+</button>
-          </div>
-          <div class="text-size zoom-ctl" role="group" aria-label="Map zoom">
-            <button id="zoom-out" aria-label="Zoom out">Zoom −</button>
-            <button id="zoom-in" aria-label="Zoom in">Zoom +</button>
-          </div>
-          <button class="winter-toggle" id="winter-toggle" aria-pressed="false">❄ Winter</button>
-          <button class="winter-toggle" id="locate-btn" aria-label="Centre on my location">⦿ Locate</button>
+        <select class="area-select" id="area-select" aria-label="Jump to forecast area">
+          <option value="">Jump to area…</option>
+        </select>
+        <div class="text-size" role="group" aria-label="Text size">
+          <button id="font-down" aria-label="Smaller text">A−</button>
+          <button id="font-reset" aria-label="Reset text size">A</button>
+          <button id="font-up" aria-label="Larger text">A+</button>
         </div>
-        <div class="topbar-row">
-          <div class="seg" role="group" aria-label="Map layers">
-            <button class="winter-toggle" id="peaks-toggle" aria-pressed="false">⛰ Peaks</button>
-            <button class="winter-toggle" id="small-toggle" aria-pressed="false">▲ Hills</button>
-            <button class="winter-toggle" id="crags-toggle" aria-pressed="false">⚒ Crags</button>
-          </div>
+        <div class="seg" role="group" aria-label="Peak layers">
+          <button class="winter-toggle" id="peaks-toggle" aria-pressed="false">⛰ Peaks</button>
+          <button class="winter-toggle" id="small-toggle" aria-pressed="false">▲ Small</button>
         </div>
+        <button class="winter-toggle" id="winter-toggle" aria-pressed="false">❄ Winter</button>
+        <button class="winter-toggle" id="locate-btn" aria-label="Centre on my location">⦿ Locate</button>
       </div>
       <button class="fab" id="investigate">⌖ Investigate</button>
       <div id="sheet" aria-live="polite"></div>
     `;
 
     // --- Leaflet map ---------------------------------------------------------
-    // zoomControl:false — Leaflet's corner +/− overlapped the area dropdown;
-    // zoom now lives in the topbar beside the text-size control.
-    map = L.map("map", { zoomControl: false, attributionControl: true })
+    map = L.map("map", { zoomControl: true, attributionControl: true })
            .setView([56.8, -5.0], 8); // West Highlands default
 
     // Carto Voyager tiles — warm topographic base with bolder, clearer place labels.
@@ -84,33 +73,14 @@
     });
     if (S.store.get("winter", false)) setSaisOverlay(true);
 
-    // --- Peaks / Hills / Crags layer toggles ---------------------------------
-    // Crags (Phase 5b) is YEAR-ROUND, deliberately independent of the Winter
-    // toggle — rock climbing isn't seasonal, only the conditions are.
-    layerBtns = {
-      munros: stage.querySelector("#peaks-toggle"),
-      small:  stage.querySelector("#small-toggle"),
-      crags:  stage.querySelector("#crags-toggle"),
-    };
-    for (const key of Object.keys(LAYER_DEFS)) {
-      const d = LAYER_DEFS[key], btn = layerBtns[key];
-      btn.addEventListener("click", () => toggleLayer(key, d.path, d.cls, btn));
-      // Restore last state (off by default to keep the map clean).
-      if (S.store.get({ munros: "peaks-on", small: "small-on", crags: "crags-on" }[key], false)) {
-        toggleLayer(key, d.path, d.cls, btn);
-      }
-    }
-
-    // My Pins: right-click (Mac) / long-press (phone) anywhere on the map to
-    // add your own peak, hill or crag — no editing files behind the scenes.
-    map.on("contextmenu", (e) => {
-      if (e.originalEvent) e.originalEvent.preventDefault();
-      openAddPin(e.latlng.lat, e.latlng.lng);
-    });
-
-    // --- Map zoom buttons (replace Leaflet's corner control) -----------------
-    stage.querySelector("#zoom-in").addEventListener("click", () => map.zoomIn());
-    stage.querySelector("#zoom-out").addEventListener("click", () => map.zoomOut());
+    // --- Peaks layer toggles -------------------------------------------------
+    const pt = stage.querySelector("#peaks-toggle");
+    pt.addEventListener("click", () => toggleLayer("munros", "static/data/peaks.json", "peak-pin", pt));
+    const st = stage.querySelector("#small-toggle");
+    st.addEventListener("click", () => toggleLayer("small", "static/data/small-mountains.json", "peak-pin small-pin", st));
+    // Restore last states (off by default to keep the map clean).
+    if (S.store.get("peaks-on", false)) toggleLayer("munros", "static/data/peaks.json", "peak-pin", pt);
+    if (S.store.get("small-on", false)) toggleLayer("small", "static/data/small-mountains.json", "peak-pin small-pin", st);
 
     // --- Text size control ---------------------------------------------------
     const fontDown = stage.querySelector("#font-down");
@@ -183,14 +153,6 @@
 
   // Lazy-loaded marker layers, keyed by name.
   const layers = {};
-  // One definition per layer, shared by the topbar toggles and the My-Pins
-  // refresh logic. kind = the type a user-added pin declares.
-  const LAYER_DEFS = {
-    munros: { path: "static/data/peaks.json",           cls: "peak-pin",           kind: "peak" },
-    small:  { path: "static/data/small-mountains.json", cls: "peak-pin small-pin", kind: "hill" },
-    crags:  { path: "static/data/crags.json",           cls: "peak-pin crag-pin",  kind: "crag" },
-  };
-  let layerBtns = {};   // toggle buttons, captured each render
 
   // --- SAIS avalanche overlay (Phase 5a + 5d) -------------------------------
   // Shown when Winter is on. One /api/sais call covers all six regions; each
@@ -200,8 +162,9 @@
   // banner instead (Callum's chosen behaviour). Tap a region -> detail sheet
   // with a Library deep-link into Module 5 (the 5d wiring).
   //
-  // Verified against library.json (uploaded 2026-06-10): Module 5 id.
-  const SNOWPACK_MODULE = "snowpack-safety";
+  // NOTE: confirm SNOWPACK_MODULE matches the Module 5 id in the library
+  // curriculum JSON — set from memory of "Snowpack & Safety", unverified.
+  const SNOWPACK_MODULE = "snowpack";
   let saisLayer = null;
   let saisBanner = null;
 
@@ -302,7 +265,7 @@
       </div>`;
     sheet.querySelector("#sais-full").addEventListener("click", () => S.iab.open(r.url, `${r.name} — SAIS`));
     // 5d: the contextual hook from the overlay into Library Module 5.
-    sheet.querySelector("#sais-learn").addEventListener("click", () => S.openLibrary(SNOWPACK_MODULE, "hazard-scale"));
+    sheet.querySelector("#sais-learn").addEventListener("click", () => S.openLibrary(SNOWPACK_MODULE, "hazard-rose"));
 
     fetch(S.url(`api/sais?region=${encodeURIComponent(r.id)}`))
       .then((res) => res.json())
@@ -326,187 +289,32 @@
 
 
   async function toggleLayer(key, dataPath, pinClass, btn) {
-    const storeKey = { munros: "peaks-on", small: "small-on", crags: "crags-on" }[key] || key + "-on";
     if (layers[key] && map.hasLayer(layers[key])) {
       map.removeLayer(layers[key]);
       btn.setAttribute("aria-pressed", "false");
-      S.store.set(storeKey, false);
+      S.store.set(key === "munros" ? "peaks-on" : "small-on", false);
       return;
     }
     if (!layers[key]) {
-      let items = [];
-      try {
-        const data = await (await fetch(S.url(dataPath))).json();
-        items = data.peaks || data.crags || [];
-      } catch {}
-      // Merge in the user's own pins of this kind (stored in this browser).
-      const kind = (LAYER_DEFS[key] || {}).kind;
-      const mine = (S.store.get("my-pins", []) || []).filter((x) => x.kind === kind);
-      items = items.concat(mine.map((x) => ({ ...x, custom: true })));
+      let peaks = [];
+      try { peaks = (await (await fetch(S.url(dataPath))).json()).peaks || []; } catch {}
       const lg = L.layerGroup();
-      items.forEach((p) => {
+      peaks.forEach((p) => {
         const icon = L.divIcon({
-          className: pinClass + (p.custom ? " custom-pin" : ""),
+          className: pinClass,
           html: `<span class="peak-dot"></span><span class="peak-label">${p.name}</span>`,
           iconSize: [10, 10],
           iconAnchor: [5, 5],
         });
         const m = L.marker([p.lat, p.lon], { icon, title: p.name });
-        m.on("click", () => (p.custom ? openCustomPin(p) : key === "crags" ? openCrag(p) : openPeak(p)));
+        m.on("click", () => openPeak(p));
         lg.addLayer(m);
       });
       layers[key] = lg;
     }
     layers[key].addTo(map);
     btn.setAttribute("aria-pressed", "true");
-    S.store.set(storeKey, true);
-  }
-
-  // --- My Pins -------------------------------------------------------------
-  // User-added peaks/hills/crags, stored in this browser via S.store
-  // ("my-pins"). Added by right-click / long-press on the map, or from the
-  // Investigate panel. Custom pins render inside the matching toggle layer
-  // with a dashed-ring marker, and can be removed from their own sheet.
-  const KIND_META = {
-    peak: { key: "munros", label: "Peak", icon: "⛰" },
-    hill: { key: "small",  label: "Hill", icon: "▲" },
-    crag: { key: "crags",  label: "Crag", icon: "⚒" },
-  };
-
-  function refreshLayerFor(kind) {
-    const key = KIND_META[kind].key;
-    const def = LAYER_DEFS[key];
-    const btn = layerBtns[key];
-    const wasOn = layers[key] && map && map.hasLayer(layers[key]);
-    if (wasOn) map.removeLayer(layers[key]);
-    delete layers[key];                       // invalidate cache so pins reload
-    if (btn) toggleLayer(key, def.path, def.cls, btn);   // (re)builds + shows
-  }
-
-  function openAddPin(lat, lon, suggested) {
-    const sheet = document.getElementById("sheet");
-    sheet.classList.add("open");
-    sheet.classList.remove("expanded");
-    sheet.innerHTML = `
-      <div class="sheet-grip"><span></span></div>
-      <div class="sheet-head">
-        <div>
-          <h2>📍 New pin</h2>
-          <div class="coords">${lat.toFixed(4)}, ${lon.toFixed(4)}</div>
-        </div>
-        <button class="sheet-close" onclick="document.getElementById('sheet').classList.remove('open')">✕</button>
-      </div>
-      <div class="sheet-body">
-        <div class="pin-form">
-          <input id="pin-name" type="text" maxlength="60" placeholder="Name this place…" value="${(suggested || "").replace(/"/g, "&quot;")}" />
-          <div class="seg" role="group" aria-label="Pin type">
-            <button class="winter-toggle pin-kind" data-kind="peak" aria-pressed="true">⛰ Peak</button>
-            <button class="winter-toggle pin-kind" data-kind="hill" aria-pressed="false">▲ Hill</button>
-            <button class="winter-toggle pin-kind" data-kind="crag" aria-pressed="false">⚒ Crag</button>
-          </div>
-          <button class="fab-inline" id="pin-save">Save pin</button>
-          <div class="attribution">Saved on this device — your pins live in this browser's storage, so add them on the phone too if you want them there.</div>
-        </div>
-      </div>`;
-    let kind = "peak";
-    sheet.querySelectorAll(".pin-kind").forEach((b) => {
-      b.addEventListener("click", () => {
-        kind = b.dataset.kind;
-        sheet.querySelectorAll(".pin-kind").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
-      });
-    });
-    sheet.querySelector("#pin-save").addEventListener("click", () => {
-      const name = (sheet.querySelector("#pin-name").value || "").replace(/[<>]/g, "").trim() || "Unnamed pin";
-      const pins = S.store.get("my-pins", []) || [];
-      pins.push({ id: Date.now(), name, kind, lat, lon });
-      S.store.set("my-pins", pins);
-      sheet.classList.remove("open");
-      refreshLayerFor(kind);                  // show it immediately (turns the layer on)
-      S.toast(`${KIND_META[kind].icon} ${name} pinned`);
-    });
-    const nameEl = sheet.querySelector("#pin-name");
-    nameEl.focus();
-    // If no name was suggested, quietly ask /api/place for one (non-blocking).
-    if (!suggested) {
-      fetchPlaceName(lat, lon).then((n) => {
-        if (n && !nameEl.value) nameEl.value = n;
-      }).catch(() => {});
-    }
-  }
-
-  function openCustomPin(p) {
-    const sheet = document.getElementById("sheet");
-    const meta = KIND_META[p.kind] || KIND_META.peak;
-    sheet.classList.add("open");
-    sheet.classList.remove("expanded");
-    sheet.innerHTML = `
-      <div class="sheet-grip"><span></span></div>
-      <div class="sheet-head">
-        <div>
-          <h2>${meta.icon} ${p.name}</h2>
-          <div class="coords">Your ${meta.label.toLowerCase()} · ${p.lat.toFixed(4)}, ${p.lon.toFixed(4)}</div>
-        </div>
-        <button class="sheet-close" onclick="document.getElementById('sheet').classList.remove('open')">✕</button>
-      </div>
-      <div class="sheet-body">
-        <div class="fc-links">
-          <a class="fc-link" id="custom-investigate">⌖ Investigate this point</a>
-          <a class="fc-link" id="custom-remove">🗑 Remove this pin</a>
-        </div>
-        <div class="attribution">A pin you added, stored in this browser.</div>
-      </div>`;
-    sheet.querySelector("#custom-investigate").addEventListener("click", () => {
-      map.setView([p.lat, p.lon], Math.max(map.getZoom(), 11), { animate: true });
-      investigate();
-    });
-    const rm = sheet.querySelector("#custom-remove");
-    rm.addEventListener("click", () => {
-      if (!rm.dataset.armed) {                 // two-tap confirm, no popup
-        rm.dataset.armed = "1";
-        rm.textContent = "🗑 Tap again to remove";
-        return;
-      }
-      const pins = (S.store.get("my-pins", []) || []).filter((x) => x.id !== p.id);
-      S.store.set("my-pins", pins);
-      sheet.classList.remove("open");
-      refreshLayerFor(p.kind);
-      S.toast("Pin removed");
-    });
-  }
-
-  // Open a crag (Phase 5b): name + route count, link to its UKC page in the
-  // in-app viewer (link-out, not scrape — UKC gets the traffic), and
-  // Investigate-at-crag. Every crag's id/slug/coords were verified against
-  // UKC's own crag database, never guessed.
-  function openCrag(c) {
-    const sheet = document.getElementById("sheet");
-    const url = `https://www.ukclimbing.com/logbook/crags/${c.ukc}/`;
-    sheet.classList.add("open");
-    sheet.classList.remove("expanded");
-    sheet.innerHTML = `
-      <div class="sheet-grip"><span></span></div>
-      <div class="sheet-head">
-        <div>
-          <h2>⚒ ${c.name}</h2>
-          <div class="coords">${c.area} · ${c.routes} routes on UKC</div>
-        </div>
-        <button class="sheet-close" onclick="document.getElementById('sheet').classList.remove('open')">✕</button>
-      </div>
-      <div class="sheet-body">
-        <div class="fc-links">
-          <a class="fc-link" id="crag-ukc">⚒ Crag &amp; conditions on UKC</a>
-          <a class="fc-link" id="crag-investigate">⌖ Investigate this point</a>
-        </div>
-        <div class="attribution">
-          Crag data © <a href="https://www.ukclimbing.com/" target="_blank" rel="noopener">UKClimbing.com</a>.
-          Tap through for routes, logbooks and live condition reports.
-        </div>
-      </div>`;
-    sheet.querySelector("#crag-ukc").addEventListener("click", () => S.iab.open(url, `${c.name} — UKC`));
-    sheet.querySelector("#crag-investigate").addEventListener("click", () => {
-      map.setView([c.lat, c.lon], Math.max(map.getZoom(), 11), { animate: true });
-      investigate();
-    });
+    S.store.set(key === "munros" ? "peaks-on" : "small-on", true);
   }
 
   // Open a summit: show a sheet with height + a link to its mountain-forecast.com
@@ -558,22 +366,11 @@
           "No land forecast here — pan the crosshair onto a mountain or coastline and try again.");
       } else {
         renderPanel(sheet, c, data);
-        // Offer to keep this spot — feeds the My Pins feature.
-        let resolvedName = null;
-        const body = sheet.querySelector(".sheet-body");
-        if (body) {
-          const a = document.createElement("a");
-          a.className = "fc-link pin-save";
-          a.textContent = "📍 Save this point as a pin";
-          a.addEventListener("click", () => openAddPin(c.lat, c.lng, resolvedName));
-          body.appendChild(a);
-        }
         // Item 2: resolve a human place name in the background and slot it into
         // the header once it arrives. Non-blocking — the panel renders instantly
         // with coordinates, and the name replaces them if/when it resolves.
         fetchPlaceName(c.lat, c.lng).then((name) => {
           if (!name) return;
-          resolvedName = name;
           const el = sheet.querySelector(".coords");
           if (el) { el.textContent = name; el.classList.add("place-named"); }
         });

@@ -1,0 +1,11 @@
+{
+  "_note": "The six SAIS forecast regions. lat/lon are INDICATIVE region anchor points (each pinned to the region's best-known summit) for drawing the cheap circle overlay — they are NOT survey data and the circle radius makes precision non-critical. Proper region GeoJSON boundaries are a later nicety (see Phase 5 scope). slug = the path on sais.gov.uk. Cross-check anchors against peaks.json (DoBIH) if ever in doubt.",
+  "regions": [
+    { "id": "lochaber",            "name": "Lochaber",            "slug": "lochaber",            "lat": 56.797, "lon": -5.004, "radius_m": 12000 },
+    { "id": "glencoe",             "name": "Glencoe",             "slug": "glencoe",             "lat": 56.643, "lon": -5.029, "radius_m": 10000 },
+    { "id": "creag-meagaidh",      "name": "Creag Meagaidh",      "slug": "creag-meagaidh",      "lat": 56.953, "lon": -4.605, "radius_m": 10000 },
+    { "id": "northern-cairngorms", "name": "Northern Cairngorms", "slug": "northern-cairngorms", "lat": 57.112, "lon": -3.676, "radius_m": 13000 },
+    { "id": "southern-cairngorms", "name": "Southern Cairngorms", "slug": "southern-cairngorms", "lat": 56.960, "lon": -3.245, "radius_m": 13000 },
+    { "id": "torridon",            "name": "Torridon",            "slug": "torridon",            "lat": 57.557, "lon": -5.485, "radius_m": 11000 }
+  ]
+}

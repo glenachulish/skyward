@@ -1,0 +1,459 @@
+{
+ "_note": "50 popular UK climbing venues (year-round, Scotland-weighted). Every entry's slug, coordinates and route count were pulled programmatically from UKC's own crag-search API (api.ukclimbing.com, 2026-06-10) — never typed from memory. URL = https://www.ukclimbing.com/logbook/crags/<ukc>/",
+ "attribution": {
+  "name": "UKClimbing.com",
+  "url": "https://www.ukclimbing.com/logbook/"
+ },
+ "crags": [
+  {
+   "name": "Ben Nevis",
+   "lat": 56.79686,
+   "lon": -5.00382,
+   "ukc": "ben_nevis-16877",
+   "routes": 546,
+   "area": "Highland",
+   "country": "Scotland"
+  },
+  {
+   "name": "Cairn Gorm - Stob Coire an t-Sneachda",
+   "lat": 57.1065,
+   "lon": -3.6594,
+   "ukc": "cairn_gorm_-_stob_coire_an_t-sneachda-25",
+   "routes": 227,
+   "area": "Invernesshire",
+   "country": "Scotland"
+  },
+  {
+   "name": "Cairn Gorm - Cairn Lochan",
+   "lat": 57.10271,
+   "lon": -3.676,
+   "ukc": "cairn_gorm_-_cairn_lochan-74",
+   "routes": 136,
+   "area": "Invernesshire",
+   "country": "Scotland"
+  },
+  {
+   "name": "Hell's Lum",
+   "lat": 57.09555,
+   "lon": -3.65889,
+   "ukc": "hells_lum-28",
+   "routes": 102,
+   "area": "Moray",
+   "country": "Scotland"
+  },
+  {
+   "name": "Shelterstone Crag",
+   "lat": 57.0919,
+   "lon": -3.6503,
+   "ukc": "shelterstone_crag_moray-32",
+   "routes": 86,
+   "area": "Moray",
+   "country": "Scotland"
+  },
+  {
+   "name": "Beinn a' Bhuird",
+   "lat": 57.08772,
+   "lon": -3.4998,
+   "ukc": "beinn_a_bhuird-14626",
+   "routes": 113,
+   "area": "Aberdeenshire",
+   "country": "Scotland"
+  },
+  {
+   "name": "Creag Meagaidh",
+   "lat": 56.95197,
+   "lon": -4.60207,
+   "ukc": "creag_meagaidh-178",
+   "routes": 70,
+   "area": "Highland",
+   "country": "Scotland"
+  },
+  {
+   "name": "Lochnagar",
+   "lat": 56.9551,
+   "lon": -3.237,
+   "ukc": "lochnagar-24",
+   "routes": 338,
+   "area": "Aberdeenshire",
+   "country": "Scotland"
+  },
+  {
+   "name": "Bidean nam Bian - Stob Coire nan Lochan",
+   "lat": 56.6488,
+   "lon": -5.02187,
+   "ukc": "bidean_nam_bian_-_stob_coire_nan_lochan-533",
+   "routes": 108,
+   "area": "Highland",
+   "country": "Scotland"
+  },
+  {
+   "name": "Aonach Dubh",
+   "lat": 56.65501,
+   "lon": -5.02823,
+   "ukc": "aonach_dubh-23162",
+   "routes": 244,
+   "area": "Highland",
+   "country": "Scotland"
+  },
+  {
+   "name": "Buachaille Etive Mor",
+   "lat": 56.64634,
+   "lon": -4.9004,
+   "ukc": "buachaille_etive_mor-387",
+   "routes": 321,
+   "area": "Highland",
+   "country": "Scotland"
+  },
+  {
+   "name": "Aonach Mor",
+   "lat": 56.813,
+   "lon": -4.9618,
+   "ukc": "aonach_mor-649",
+   "routes": 137,
+   "area": "Highland",
+   "country": "Scotland"
+  },
+  {
+   "name": "Beinn an Dothaidh",
+   "lat": 56.5301,
+   "lon": -4.7142,
+   "ukc": "beinn_an_dothaidh-621",
+   "routes": 35,
+   "area": "Argyll and Bute",
+   "country": "Scotland"
+  },
+  {
+   "name": "Beinn Udlaidh",
+   "lat": 56.4602,
+   "lon": -4.7927,
+   "ukc": "beinn_udlaidh-624",
+   "routes": 52,
+   "area": "Highland",
+   "country": "Scotland"
+  },
+  {
+   "name": "The Cobbler",
+   "lat": 56.21299,
+   "lon": -4.80816,
+   "ukc": "the_cobbler-594",
+   "routes": 163,
+   "area": "Argyll and Bute",
+   "country": "Scotland"
+  },
+  {
+   "name": "Dumbarton Rock",
+   "lat": 55.9375,
+   "lon": -4.5646,
+   "ukc": "dumbarton_rock-189",
+   "routes": 480,
+   "area": "West Dunbartonshire",
+   "country": "Scotland"
+  },
+  {
+   "name": "Polldubh Crags, Glen Nevis",
+   "lat": 56.7736,
+   "lon": -5.0295,
+   "ukc": "polldubh_crags_glen_nevis-807",
+   "routes": 547,
+   "area": "Highland",
+   "country": "Scotland"
+  },
+  {
+   "name": "Nevis Bouldering",
+   "lat": 56.7716,
+   "lon": -5.0289,
+   "ukc": "nevis_bouldering-9952",
+   "routes": 263,
+   "area": "Lochaber",
+   "country": "Scotland"
+  },
+  {
+   "name": "Liathach - Spidean a' Choire Leith",
+   "lat": 57.5641,
+   "lon": -5.4636,
+   "ukc": "liathach_-_spidean_a_choire_leith-715",
+   "routes": 200,
+   "area": "Highland",
+   "country": "Scotland"
+  },
+  {
+   "name": "Beinn Eighe",
+   "lat": 57.5861,
+   "lon": -5.4383,
+   "ukc": "beinn_eighe-774",
+   "routes": 214,
+   "area": "Highland",
+   "country": "Scotland"
+  },
+  {
+   "name": "An Teallach - Bidein a' Ghlas Thuill",
+   "lat": 57.80719,
+   "lon": -5.25183,
+   "ukc": "an_teallach_-_bidein_a_ghlas_thuill-13056",
+   "routes": 106,
+   "area": "Ross & Cromarty",
+   "country": "Scotland"
+  },
+  {
+   "name": "Stac Pollaidh",
+   "lat": 58.0441,
+   "lon": -5.2083,
+   "ukc": "stac_pollaidh-299",
+   "routes": 97,
+   "area": "Ross & Cromarty",
+   "country": "Scotland"
+  },
+  {
+   "name": "Reiff - Roinn a' Mhill",
+   "lat": 58.0717,
+   "lon": -5.4522,
+   "ukc": "reiff_-_roinn_a_mhill-303",
+   "routes": 220,
+   "area": "Ross & Cromarty",
+   "country": "Scotland"
+  },
+  {
+   "name": "Ardmair Crags",
+   "lat": 57.9378,
+   "lon": -5.1825,
+   "ukc": "ardmair_crags-298",
+   "routes": 128,
+   "area": "Ross & Cromarty",
+   "country": "Scotland"
+  },
+  {
+   "name": "Diabaig",
+   "lat": 57.5745,
+   "lon": -5.6756,
+   "ukc": "diabaig-773",
+   "routes": 106,
+   "area": "Highland",
+   "country": "Scotland"
+  },
+  {
+   "name": "Sron na Ciche",
+   "lat": 57.2022,
+   "lon": -6.2342,
+   "ukc": "sron_na_ciche-780",
+   "routes": 156,
+   "area": "Isle of Skye",
+   "country": "Scotland"
+  },
+  {
+   "name": "Kilt Rock, Staffin",
+   "lat": 57.6167,
+   "lon": -6.1757,
+   "ukc": "kilt_rock_staffin-685",
+   "routes": 67,
+   "area": "Isle of Skye",
+   "country": "Scotland"
+  },
+  {
+   "name": "Cir Mhor",
+   "lat": 55.6388,
+   "lon": -5.2218,
+   "ukc": "cir_mhor-13421",
+   "routes": 79,
+   "area": "Arran",
+   "country": "Scotland"
+  },
+  {
+   "name": "Polney Crag (Craig a Barns)",
+   "lat": 56.5698,
+   "lon": -3.6121,
+   "ukc": "polney_crag_craig_a_barns-35",
+   "routes": 117,
+   "area": "Perthshire",
+   "country": "Scotland"
+  },
+  {
+   "name": "Beinn Trilleachan (Etive Slabs)",
+   "lat": 56.5531,
+   "lon": -5.0957,
+   "ukc": "beinn_trilleachan_etive_slabs-535",
+   "routes": 56,
+   "area": "Argyll and Bute",
+   "country": "Scotland"
+  },
+  {
+   "name": "Scafell Crag",
+   "lat": 54.4497,
+   "lon": -3.219,
+   "ukc": "scafell_crag-680",
+   "routes": 157,
+   "area": "Cumbria",
+   "country": "England"
+  },
+  {
+   "name": "Dow Crag",
+   "lat": 54.3703,
+   "lon": -3.1366,
+   "ukc": "dow_crag_cumbria-355",
+   "routes": 153,
+   "area": "Cumbria",
+   "country": "England"
+  },
+  {
+   "name": "Gimmer Crag",
+   "lat": 54.4531,
+   "lon": -3.1153,
+   "ukc": "gimmer_crag-345",
+   "routes": 113,
+   "area": "Cumbria",
+   "country": "England"
+  },
+  {
+   "name": "Great End",
+   "lat": 54.4648,
+   "lon": -3.1963,
+   "ukc": "great_end-14923",
+   "routes": 56,
+   "area": "Cumbria",
+   "country": "England"
+  },
+  {
+   "name": "The Napes",
+   "lat": 54.48,
+   "lon": -3.2194,
+   "ukc": "the_napes-662",
+   "routes": 104,
+   "area": "Cumbria",
+   "country": "England"
+  },
+  {
+   "name": "Shepherd's Crag",
+   "lat": 54.5561,
+   "lon": -3.1397,
+   "ukc": "shepherds_crag_cumbria-747",
+   "routes": 173,
+   "area": "Cumbria",
+   "country": "England"
+  },
+  {
+   "name": "Stanage Popular",
+   "lat": 53.3458,
+   "lon": -1.6319,
+   "ukc": "stanage_popular-104",
+   "routes": 777,
+   "area": "Derbyshire",
+   "country": "England"
+  },
+  {
+   "name": "Froggatt Edge",
+   "lat": 53.2868,
+   "lon": -1.6284,
+   "ukc": "froggatt_edge-22",
+   "routes": 576,
+   "area": "Derbyshire",
+   "country": "England"
+  },
+  {
+   "name": "Roaches Lower Tier",
+   "lat": 53.1571,
+   "lon": -1.9926,
+   "ukc": "roaches_lower_tier-105",
+   "routes": 347,
+   "area": "Staffordshire",
+   "country": "England"
+  },
+  {
+   "name": "Kinder Downfall",
+   "lat": 53.39612,
+   "lon": -1.87866,
+   "ukc": "kinder_downfall-134",
+   "routes": 356,
+   "area": "Derbyshire",
+   "country": "England"
+  },
+  {
+   "name": "Malham Cove",
+   "lat": 54.0736,
+   "lon": -2.1589,
+   "ukc": "malham_cove-610",
+   "routes": 361,
+   "area": "North Yorkshire",
+   "country": "England"
+  },
+  {
+   "name": "Almscliff",
+   "lat": 53.9364,
+   "lon": -1.5933,
+   "ukc": "almscliff-373",
+   "routes": 700,
+   "area": "North Yorkshire",
+   "country": "England"
+  },
+  {
+   "name": "Dinas Cromlech",
+   "lat": 53.0917,
+   "lon": -4.0489,
+   "ukc": "dinas_cromlech-4",
+   "routes": 95,
+   "area": "Gwynedd",
+   "country": "Wales"
+  },
+  {
+   "name": "Cwm Idwal [Idwal Slabs]",
+   "lat": 53.1099,
+   "lon": -4.0254,
+   "ukc": "cwm_idwal-496",
+   "routes": 140,
+   "area": "Gwynedd",
+   "country": "Wales"
+  },
+  {
+   "name": "Tryfan",
+   "lat": 53.11495,
+   "lon": -3.9976,
+   "ukc": "tryfan-491",
+   "routes": 170,
+   "area": "Gwynedd",
+   "country": "Wales"
+  },
+  {
+   "name": "Clogwyn Du'r Arddu (Cloggy)",
+   "lat": 53.0788,
+   "lon": -4.0909,
+   "ukc": "clogwyn_dur_arddu_cloggy-457",
+   "routes": 215,
+   "area": "Gwynedd",
+   "country": "Wales"
+  },
+  {
+   "name": "Gogarth North Stack and Main Cliff",
+   "lat": 53.3176,
+   "lon": -4.6799,
+   "ukc": "gogarth_north_stack_and_main_cliff-598",
+   "routes": 389,
+   "area": "Anglesey",
+   "country": "Wales"
+  },
+  {
+   "name": "Craig Bwlch y Moch (Tremadog)",
+   "lat": 52.9439,
+   "lon": -4.1192,
+   "ukc": "craig_bwlch_y_moch_tremadog-221",
+   "routes": 202,
+   "area": "Gwynedd",
+   "country": "Wales"
+  },
+  {
+   "name": "Diffwys Ddu [Cyrn Las (Gyrn Las)]",
+   "lat": 53.0842,
+   "lon": -4.0708,
+   "ukc": "diffwys_ddu-695",
+   "routes": 36,
+   "area": "Gwynedd",
+   "country": "Wales"
+  },
+  {
+   "name": "Clogwyn y Garnedd",
+   "lat": 53.07139,
+   "lon": -4.07306,
+   "ukc": "clogwyn_y_garnedd-1346",
+   "routes": 34,
+   "area": "Gwynedd",
+   "country": "Wales"
+  }
+ ]
+}
