@@ -180,6 +180,64 @@ async def place(
     return {"name": name}
 
 
+# --- Place search (forward geocoding) -----------------------------------------
+# "Type Hen Cloud, the map flies there." Nominatim's /search endpoint — the
+# forward twin of the /api/place reverse lookup above, under the same usage
+# policy: identifying User-Agent, in-process cache, user-triggered queries
+# only. UK-limited (countrycodes=gb); widen the list if trips abroad happen.
+NOMINATIM_SEARCH_URL = "https://nominatim.openstreetmap.org/search"
+_search_cache: dict[str, tuple[float, dict]] = {}
+_SEARCH_TTL = 24 * 3600
+
+
+@app.get("/api/search")
+async def place_search(q: str = Query(..., min_length=2, max_length=80)):
+    """Search UK place names -> up to 8 results {name, lat, lon, kind, area}."""
+    key = q.strip().lower()
+    now = time.time()
+    cached = _search_cache.get(key)
+    if cached and now - cached[0] < _SEARCH_TTL:
+        return cached[1]
+
+    attribution = {"name": "OpenStreetMap (Nominatim)",
+                   "url": "https://www.openstreetmap.org/",
+                   "licence": "ODbL — © OpenStreetMap contributors"}
+    params = {"q": q, "format": "jsonv2", "limit": 8,
+              "countrycodes": "gb", "accept-language": "en-gb"}
+    try:
+        async with httpx.AsyncClient(
+            timeout=8.0, follow_redirects=True,
+            headers={"User-Agent": "Skyward/1.0 (personal mountain weather app)"},
+        ) as client:
+            r = await client.get(NOMINATIM_SEARCH_URL, params=params)
+            r.raise_for_status()
+            data = r.json()
+    except (httpx.HTTPError, ValueError):
+        return {"parsed": False, "results": [], "attribution": attribution,
+                "error": "Could not reach the place search"}
+
+    results = []
+    for it in data if isinstance(data, list) else []:
+        try:
+            lat, lon = float(it["lat"]), float(it["lon"])
+        except (KeyError, TypeError, ValueError):
+            continue
+        display = it.get("display_name", "")
+        parts = [p.strip() for p in display.split(",")]
+        name = it.get("name") or (parts[0] if parts else None)
+        if not name:
+            continue
+        # A short locating hint: the next couple of address components.
+        area = ", ".join(parts[1:3]) if len(parts) > 1 else ""
+        kind = (it.get("type") or it.get("addresstype") or "").replace("_", " ")
+        results.append({"name": name, "lat": lat, "lon": lon,
+                        "kind": kind, "area": area})
+
+    payload = {"parsed": True, "results": results, "attribution": attribution}
+    _search_cache[key] = (now, payload)
+    return payload
+
+
 # --- MWIS area forecasts ------------------------------------------------------
 # MWIS (mwis.org.uk) publishes daily 3-day mountain forecasts as HTML pages
 # heavy with adverts. The brief asks for these "without all the adverts and

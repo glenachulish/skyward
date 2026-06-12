@@ -37,7 +37,7 @@
             <button class="winter-toggle" id="small-toggle" aria-pressed="false">▲ Hills</button>
             <button class="winter-toggle" id="crags-toggle" aria-pressed="false">⚒ Crags</button>
           </div>
-          <button class="winter-toggle" id="crag-search-btn" aria-label="Find a crag on UKC">🔍 Find crag</button>
+          <button class="winter-toggle" id="search-btn" aria-label="Search for a place">🔍 Search</button>
         </div>
       </div>
       <button class="fab" id="investigate">⌖ Investigate</button>
@@ -113,8 +113,8 @@
     stage.querySelector("#zoom-in").addEventListener("click", () => map.zoomIn());
     stage.querySelector("#zoom-out").addEventListener("click", () => map.zoomOut());
 
-    // Find crag (live UKC search — every crag in their database, on demand)
-    stage.querySelector("#crag-search-btn").addEventListener("click", openCragSearch);
+    // Search: places via OpenStreetMap, crags via UKC link-out
+    stage.querySelector("#search-btn").addEventListener("click", openSearch);
 
     // --- Text size control ---------------------------------------------------
     const fontDown = stage.querySelector("#font-down");
@@ -387,7 +387,8 @@
     if (btn) toggleLayer(key, def.path, def.cls, btn);   // (re)builds + shows
   }
 
-  function openAddPin(lat, lon, suggested) {
+  function openAddPin(lat, lon, suggested, opts) {
+    opts = opts || {};
     const sheet = document.getElementById("sheet");
     sheet.classList.add("open");
     sheet.classList.remove("expanded");
@@ -412,7 +413,10 @@
           <div class="attribution">Saved on this device — your pins live in this browser's storage, so add them on the phone too if you want them there.</div>
         </div>
       </div>`;
-    let kind = "peak";
+    let kind = opts.kind || "peak";
+    if (kind !== "peak") {
+      sheet.querySelectorAll(".pin-kind").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.kind === kind)));
+    }
     sheet.querySelectorAll(".pin-kind").forEach((b) => {
       b.addEventListener("click", () => {
         kind = b.dataset.kind;
@@ -422,7 +426,9 @@
     sheet.querySelector("#pin-save").addEventListener("click", () => {
       const name = (sheet.querySelector("#pin-name").value || "").replace(/[<>]/g, "").trim() || "Unnamed pin";
       const pins = S.store.get("my-pins", []) || [];
-      pins.push({ id: Date.now(), name, kind, lat, lon });
+      const pin = { id: Date.now(), name, kind, lat, lon };
+      if (opts.ukc) pin.ukc = opts.ukc;       // pasted UKC link travels with the pin
+      pins.push(pin);
       S.store.set("my-pins", pins);
       sheet.classList.remove("open");
       refreshLayerFor(kind);                  // show it immediately (turns the layer on)
@@ -454,11 +460,16 @@
       </div>
       <div class="sheet-body">
         <div class="fc-links">
+          ${p.ukc ? '<a class="fc-link" id="custom-ukc">⚒ Crag &amp; conditions on UKC</a>' : ""}
           <a class="fc-link" id="custom-investigate">⌖ Investigate this point</a>
           <a class="fc-link" id="custom-remove">🗑 Remove this pin</a>
         </div>
         <div class="attribution">A pin you added, stored in this browser.</div>
       </div>`;
+    if (p.ukc) {
+      sheet.querySelector("#custom-ukc").addEventListener("click", () =>
+        S.iab.open(`https://www.ukclimbing.com/logbook/crags/${p.ukc}/`, `${p.name} — UKC`));
+    }
     sheet.querySelector("#custom-investigate").addEventListener("click", () => {
       map.setView([p.lat, p.lon], Math.max(map.getZoom(), 11), { animate: true });
       investigate();
@@ -478,14 +489,42 @@
     });
   }
 
-  // --- Find crag (UKC link-out) ----------------------------------------------
-  // UKC's API is browser-only (403 to all non-browser clients, CORS-closed to
-  // other origins — verified 2026-06-12), which is their clear signal that
-  // programmatic access is for their own site. So Find-crag respects that and
-  // LINKS OUT: type a name, open UKC's own crag search in the in-app viewer.
-  // Every crag in their database, none of it scraped; to keep one on the map,
-  // right-click / long-press its spot afterwards and save a My Pin.
-  function openCragSearch() {
+  // --- Search (places + crag link-out) ---------------------------------------
+  // "Type Hen Cloud, the map flies there, pin it." Place results come from
+  // /api/search (Nominatim forward geocoding — the same OSM service that
+  // names Investigate points, same usage policy). Tap a result: fly there,
+  // drop a temporary marker, offer Save-as-pin (pre-named) or Investigate.
+  // UKC's own crag search stays one tap away in the same sheet (their API is
+  // browser-only — see SESSION5D notes — so crags remain a courteous link-out).
+  let searchMarker = null;
+  let pendingUkc = null;   // {slug, name} from a pasted UKC link, carried into results/pins
+  const esc = (s) => String(s || "").replace(/[<>&]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" }[c]));
+
+  // "crags/hells_lum-28" -> {slug: "hells_lum-28", name: "Hells Lum"}
+  function parseUkcUrl(text) {
+    const m = String(text).match(/ukclimbing\.com\/logbook\/crags?\/([a-z0-9_'-]+-\d+)/i);
+    if (!m) return null;
+    const slug = m[1];
+    const words = slug.replace(/-\d+$/, "").split(/[_]+/).filter(Boolean);
+    const name = words.map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+    return { slug, name };
+  }
+
+  // "53.1707, -1.9803" (or space-separated) -> {lat, lon}
+  function parseCoords(text) {
+    const m = String(text).trim().match(/^(-?\d{1,2}(?:\.\d+)?)[,\s]+(-?\d{1,3}(?:\.\d+)?)$/);
+    if (!m) return null;
+    const lat = parseFloat(m[1]), lon = parseFloat(m[2]);
+    if (lat < -90 || lat > 90 || lon < -180 || lon > 180) return null;
+    return { lat, lon };
+  }
+
+  function clearSearchMarker() {
+    if (searchMarker && map) map.removeLayer(searchMarker);
+    searchMarker = null;
+  }
+
+  function openSearch() {
     const sheet = document.getElementById("sheet");
     sheet.classList.add("open");
     sheet.classList.remove("expanded");
@@ -493,32 +532,133 @@
       <div class="sheet-grip"><span></span></div>
       <div class="sheet-head">
         <div>
-          <h2>🔍 Find a crag</h2>
-          <div class="coords">Searches the UKC crag database</div>
+          <h2>🔍 Search</h2>
+          <div class="coords">Hills, crags, glens, places — anywhere in the UK</div>
         </div>
         <button class="sheet-close" onclick="document.getElementById('sheet').classList.remove('open')">✕</button>
       </div>
       <div class="sheet-body">
         <div class="pin-form crag-search">
-          <input id="crag-q" type="text" maxlength="60" placeholder="Crag name… e.g. Hen Cloud" />
-          <button class="fab-inline" id="crag-go">Search on UKC ↗</button>
-          <div class="attribution">
-            Opens the search on <a href="https://www.ukclimbing.com/logbook/" target="_blank" rel="noopener">UKClimbing.com</a> — every crag they have, with routes, logbooks and conditions.
-            Found one you'll come back to? Right-click (or long-press) its spot on the map and save it as a My Pin.
-          </div>
+          <input id="search-q" type="text" maxlength="200" placeholder="Name, UKC crag link, or lat, lon…" />
+          <button class="fab-inline" id="search-go">Search</button>
+        </div>
+        <div class="crag-results" id="search-results"></div>
+        <div class="fc-links"><a class="fc-link" id="search-ukc">⚒ Climbing crag? Search UKC ↗</a></div>
+        <div class="attribution">
+          Searches names (© <a href="https://www.openstreetmap.org/" target="_blank" rel="noopener">OpenStreetMap</a> contributors) —
+          or paste a <a href="https://www.ukclimbing.com/logbook/" target="_blank" rel="noopener">UKC</a> crag page link,
+          or the Lat/Long shown on a UKC page, and Skyward takes you straight there.
         </div>
       </div>`;
-    const input = sheet.querySelector("#crag-q");
-    const run = () => {
-      const q = (input.value || "").trim();
-      if (q.length < 2) return;
-      sheet.classList.remove("open");
-      S.iab.open("https://www.ukclimbing.com/logbook/crags/?name=" + encodeURIComponent(q),
-                 `UKC — "${q.replace(/[<>]/g, "")}"`);
-    };
-    sheet.querySelector("#crag-go").addEventListener("click", run);
+    const input = sheet.querySelector("#search-q");
+    const run = () => runPlaceSearch(input.value, sheet.querySelector("#search-results"));
+    sheet.querySelector("#search-go").addEventListener("click", run);
     input.addEventListener("keydown", (e) => { if (e.key === "Enter") run(); });
+    sheet.querySelector("#search-ukc").addEventListener("click", () => {
+      const q = (input.value || "").trim();
+      sheet.classList.remove("open");
+      S.iab.open("https://www.ukclimbing.com/logbook/crags/" + (q ? "?name=" + encodeURIComponent(q) : ""),
+                 q ? `UKC — "${esc(q)}"` : "UKC crag search");
+    });
     input.focus();
+  }
+
+  async function runPlaceSearch(q, box) {
+    q = (q || "").trim();
+    if (q.length < 2 || !box) return;
+
+    // Raw coordinates -> straight there. A UKC link pasted just before this
+    // (e.g. its name wasn't in OSM) lends the spot its crag name + link.
+    const co = parseCoords(q);
+    if (co) {
+      openSearchResult({
+        name: (pendingUkc && pendingUkc.name) || "Pasted location",
+        lat: co.lat, lon: co.lon,
+        kind: "coordinates", area: "",
+        ukc: pendingUkc && pendingUkc.slug,
+      });
+      return;
+    }
+    // UKC crag link -> extract the name, remember the slug, search the name.
+    const u = parseUkcUrl(q);
+    if (u) {
+      pendingUkc = u;
+      q = u.name;
+    } else {
+      pendingUkc = null;
+    }
+
+    box.innerHTML = `<div class="sheet-state"><div class="spinner"></div>Searching…</div>`;
+    let d = null;
+    try { d = await (await fetch(S.url("api/search?q=" + encodeURIComponent(q)))).json(); } catch {}
+    if (!d || !d.parsed) {
+      box.innerHTML = `<div class="sheet-state">Search isn't reachable right now — try again shortly.</div>`;
+      return;
+    }
+    if (!d.results.length) {
+      box.innerHTML = pendingUkc
+        ? `<div class="sheet-state">OpenStreetMap doesn't know "${esc(q)}" by name — copy the <strong>Lat/Long</strong> from the UKC page and paste it here; the pin will keep the crag's name and link.</div>`
+        : `<div class="sheet-state">Nothing in the UK matched "${esc(q)}".</div>`;
+      return;
+    }
+    const carryUkc = pendingUkc && pendingUkc.slug;
+    box.innerHTML = d.results.map((r, i) => `
+      <button class="crag-result" data-i="${i}">
+        <span class="crag-result-name">📍 ${esc(r.name)}</span>
+        <span class="crag-result-meta">${esc(r.kind)}${r.kind && r.area ? " · " : ""}${esc(r.area)}</span>
+      </button>`).join("");
+    box.querySelectorAll(".crag-result").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const r = d.results[Number(btn.dataset.i)];
+        if (carryUkc) r.ukc = carryUkc;
+        openSearchResult(r);
+      });
+    });
+  }
+
+  function openSearchResult(r) {
+    clearSearchMarker();
+    const icon = L.divIcon({
+      className: "peak-pin custom-pin",
+      html: `<span class="peak-dot"></span><span class="peak-label">${esc(r.name)}</span>`,
+      iconSize: [10, 10], iconAnchor: [5, 5],
+    });
+    searchMarker = L.marker([r.lat, r.lon], { icon, title: r.name }).addTo(map);
+    searchMarker.on("click", () => openSearchResult(r));
+    map.setView([r.lat, r.lon], Math.max(map.getZoom(), 13), { animate: true });
+
+    const sheet = document.getElementById("sheet");
+    sheet.classList.add("open");
+    sheet.classList.remove("expanded");
+    sheet.innerHTML = `
+      <div class="sheet-grip"><span></span></div>
+      <div class="sheet-head">
+        <div>
+          <h2>📍 ${esc(r.name)}</h2>
+          <div class="coords">${esc(r.kind)}${r.kind && r.area ? " · " : ""}${esc(r.area)}</div>
+        </div>
+        <button class="sheet-close" onclick="document.getElementById('sheet').classList.remove('open')">✕</button>
+      </div>
+      <div class="sheet-body">
+        <div class="fc-links">
+          <a class="fc-link" id="result-pin">📍 Save as a My Pin</a>
+          <a class="fc-link" id="result-investigate">⌖ Investigate this point</a>
+          ${r.ukc ? '<a class="fc-link" id="result-ukc">⚒ Crag &amp; conditions on UKC</a>' : ""}
+        </div>
+        <div class="attribution">${r.kind === "coordinates" ? "Pasted coordinates" : "Found via OpenStreetMap"} — the marker is temporary until you pin it.</div>
+      </div>`;
+    sheet.querySelector("#result-pin").addEventListener("click", () => {
+      clearSearchMarker();                      // the real pin replaces it
+      openAddPin(r.lat, r.lon, r.name, { ukc: r.ukc, kind: r.ukc ? "crag" : undefined });
+    });
+    if (r.ukc) {
+      sheet.querySelector("#result-ukc").addEventListener("click", () =>
+        S.iab.open(`https://www.ukclimbing.com/logbook/crags/${r.ukc}/`, `${r.name} — UKC`));
+    }
+    sheet.querySelector("#result-investigate").addEventListener("click", () => {
+      map.setView([r.lat, r.lon], Math.max(map.getZoom(), 12), { animate: true });
+      investigate();
+    });
   }
 
   // Open a crag (Phase 5b): name + route count, link to its UKC page in the
@@ -765,6 +905,7 @@
   function teardown() {
     removeSaisBanner();
     saisLayer = null;
+    searchMarker = null;
     if (map) { map.remove(); map = null; }
     for (const k in layers) delete layers[k];
   }
