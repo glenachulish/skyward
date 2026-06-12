@@ -7,3 +7,5 @@ __pycache__/
 disk-report.txt
 pk-report.txt
 .DS_Store
+*.bak-*
+index.html.stray-*
