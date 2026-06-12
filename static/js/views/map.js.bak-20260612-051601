@@ -37,7 +37,6 @@
             <button class="winter-toggle" id="small-toggle" aria-pressed="false">▲ Hills</button>
             <button class="winter-toggle" id="crags-toggle" aria-pressed="false">⚒ Crags</button>
           </div>
-          <button class="winter-toggle" id="crag-search-btn" aria-label="Find a crag on UKC">🔍 Find crag</button>
         </div>
       </div>
       <button class="fab" id="investigate">⌖ Investigate</button>
@@ -112,9 +111,6 @@
     // --- Map zoom buttons (replace Leaflet's corner control) -----------------
     stage.querySelector("#zoom-in").addEventListener("click", () => map.zoomIn());
     stage.querySelector("#zoom-out").addEventListener("click", () => map.zoomOut());
-
-    // Find crag (live UKC search — every crag in their database, on demand)
-    stage.querySelector("#crag-search-btn").addEventListener("click", openCragSearch);
 
     // --- Text size control ---------------------------------------------------
     const fontDown = stage.querySelector("#font-down");
@@ -476,49 +472,6 @@
       refreshLayerFor(p.kind);
       S.toast("Pin removed");
     });
-  }
-
-  // --- Find crag (UKC link-out) ----------------------------------------------
-  // UKC's API is browser-only (403 to all non-browser clients, CORS-closed to
-  // other origins — verified 2026-06-12), which is their clear signal that
-  // programmatic access is for their own site. So Find-crag respects that and
-  // LINKS OUT: type a name, open UKC's own crag search in the in-app viewer.
-  // Every crag in their database, none of it scraped; to keep one on the map,
-  // right-click / long-press its spot afterwards and save a My Pin.
-  function openCragSearch() {
-    const sheet = document.getElementById("sheet");
-    sheet.classList.add("open");
-    sheet.classList.remove("expanded");
-    sheet.innerHTML = `
-      <div class="sheet-grip"><span></span></div>
-      <div class="sheet-head">
-        <div>
-          <h2>🔍 Find a crag</h2>
-          <div class="coords">Searches the UKC crag database</div>
-        </div>
-        <button class="sheet-close" onclick="document.getElementById('sheet').classList.remove('open')">✕</button>
-      </div>
-      <div class="sheet-body">
-        <div class="pin-form crag-search">
-          <input id="crag-q" type="text" maxlength="60" placeholder="Crag name… e.g. Hen Cloud" />
-          <button class="fab-inline" id="crag-go">Search on UKC ↗</button>
-          <div class="attribution">
-            Opens the search on <a href="https://www.ukclimbing.com/logbook/" target="_blank" rel="noopener">UKClimbing.com</a> — every crag they have, with routes, logbooks and conditions.
-            Found one you'll come back to? Right-click (or long-press) its spot on the map and save it as a My Pin.
-          </div>
-        </div>
-      </div>`;
-    const input = sheet.querySelector("#crag-q");
-    const run = () => {
-      const q = (input.value || "").trim();
-      if (q.length < 2) return;
-      sheet.classList.remove("open");
-      S.iab.open("https://www.ukclimbing.com/logbook/crags/?name=" + encodeURIComponent(q),
-                 `UKC — "${q.replace(/[<>]/g, "")}"`);
-    };
-    sheet.querySelector("#crag-go").addEventListener("click", run);
-    input.addEventListener("keydown", (e) => { if (e.key === "Enter") run(); });
-    input.focus();
   }
 
   // Open a crag (Phase 5b): name + route count, link to its UKC page in the

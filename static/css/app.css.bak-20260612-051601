@@ -657,19 +657,3 @@ body.winter .module-head .num { color: #fff; }
 /* A pin the user added: same family as its layer, with a dashed halo ring */
 .custom-pin .peak-dot { outline: 2px dashed currentColor; outline-offset: 2px; }
 .custom-pin .peak-label { font-style: italic; }
-
-/* Find-crag results (live UKC search) */
-.crag-search .fab-inline { align-self: stretch; }
-.crag-results { display: flex; flex-direction: column; gap: .4rem; margin: .8rem 0; }
-.crag-result {
-  display: flex; justify-content: space-between; align-items: baseline; gap: .8rem;
-  font: inherit; text-align: left; cursor: pointer;
-  color: var(--ink);
-  background: var(--bg-raised, #fbfaf6);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  padding: .55rem .75rem;
-}
-.crag-result:hover { border-color: var(--accent); }
-.crag-result-name { font-weight: 600; }
-.crag-result-meta { font-size: .8rem; opacity: .7; white-space: nowrap; }

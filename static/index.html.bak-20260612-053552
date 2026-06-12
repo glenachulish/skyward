@@ -44,7 +44,7 @@
   <script src="static/js/store.js?v=9"></script>
   <script src="static/js/weather.js?v=9"></script>
   <script src="static/js/iab.js?v=9"></script>
-  <script src="static/js/views/map.js?v=15"></script>
+  <script src="static/js/views/map.js?v=14"></script>
   <script src="static/js/views/forecast.js?v=9"></script>
   <script src="static/js/views/webcams.js?v=9"></script>
   <script src="static/js/views/library.js?v=9"></script>

@@ -578,6 +578,57 @@ async def sais(region: "str | None" = Query(None, min_length=2, max_length=64)):
     return payload
 
 
+# --- UKC crag search (Phase 5b+) ------------------------------------------------
+# Live search of UKC's crag database, proxied so the frontend stays same-origin.
+# This deliberately REPLACES any idea of bulk-copying their database: each query
+# goes to UKC on demand, results carry attribution, and tapping through opens
+# their page (they get the traffic). Light personal use: per-query 24h cache,
+# identifying User-Agent, UK-filtered results capped at 12.
+UKC_SEARCH_URL = "https://api.ukclimbing.com/site/logbook/v1/crag_search/"
+_ukc_cache: dict[str, tuple[float, dict]] = {}
+_UKC_TTL = 24 * 3600
+_UKC_UK = {"England", "Scotland", "Wales", "Northern Ireland"}
+
+
+@app.get("/api/ukc")
+async def ukc_search(q: str = Query(..., min_length=2, max_length=60)):
+    """Search UKC crags by name. Returns up to 12 UK matches, biggest first."""
+    import html as _html
+    key = q.strip().lower()
+    now = time.time()
+    cached = _ukc_cache.get(key)
+    if cached and now - cached[0] < _UKC_TTL:
+        return cached[1]
+
+    attribution = {"name": "UKClimbing.com", "url": "https://www.ukclimbing.com/logbook/"}
+    try:
+        async with httpx.AsyncClient(timeout=10.0,
+                                     headers={"User-Agent": "Skyward/1.0 (personal mountain weather app)"}) as client:
+            r = await client.get(UKC_SEARCH_URL, params={"name": q})
+            r.raise_for_status()
+            data = r.json()
+    except (httpx.HTTPError, ValueError):
+        return {"parsed": False, "results": [], "attribution": attribution,
+                "error": "Could not reach UKC"}
+
+    results = []
+    for c in data.get("results", []):
+        if c.get("is_hill") or c.get("country_name") not in _UKC_UK:
+            continue
+        results.append({
+            "name": _html.unescape(c.get("name", "")),
+            "lat": c.get("osy"), "lon": c.get("osx"),
+            "ukc": c.get("slug"),
+            "routes": c.get("nroutes", 0),
+            "area": _html.unescape(c.get("county_name") or ""),
+            "country": c.get("country_name"),
+        })
+    results.sort(key=lambda x: -(x["routes"] or 0))
+    payload = {"parsed": True, "results": results[:12], "attribution": attribution}
+    _ukc_cache[key] = (now, payload)
+    return payload
+
+
 # --- Static frontend ----------------------------------------------------------
 # Assets live under /static/... (matching the relative paths the HTML emits:
 # "static/css/app.css" etc). The backend is prefix-naive, so these are real

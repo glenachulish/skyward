@@ -478,13 +478,12 @@
     });
   }
 
-  // --- Find crag (UKC link-out) ----------------------------------------------
-  // UKC's API is browser-only (403 to all non-browser clients, CORS-closed to
-  // other origins — verified 2026-06-12), which is their clear signal that
-  // programmatic access is for their own site. So Find-crag respects that and
-  // LINKS OUT: type a name, open UKC's own crag search in the in-app viewer.
-  // Every crag in their database, none of it scraped; to keep one on the map,
-  // right-click / long-press its spot afterwards and save a My Pin.
+  // --- Find crag (live UKC search) ------------------------------------------
+  // Searches UKC's whole crag database on demand via /api/ukc — nothing is
+  // copied locally; tap a result to fly there, open its UKC page, or keep it
+  // as a My Pin. (This is the "all the crags" feature, done by link-out.)
+  let searchMarker = null;
+
   function openCragSearch() {
     const sheet = document.getElementById("sheet");
     sheet.classList.add("open");
@@ -501,24 +500,54 @@
       <div class="sheet-body">
         <div class="pin-form crag-search">
           <input id="crag-q" type="text" maxlength="60" placeholder="Crag name… e.g. Hen Cloud" />
-          <button class="fab-inline" id="crag-go">Search on UKC ↗</button>
-          <div class="attribution">
-            Opens the search on <a href="https://www.ukclimbing.com/logbook/" target="_blank" rel="noopener">UKClimbing.com</a> — every crag they have, with routes, logbooks and conditions.
-            Found one you'll come back to? Right-click (or long-press) its spot on the map and save it as a My Pin.
-          </div>
+          <button class="fab-inline" id="crag-go">Search UKC</button>
+        </div>
+        <div class="crag-results" id="crag-results"></div>
+        <div class="attribution">
+          Crag data © <a href="https://www.ukclimbing.com/logbook/" target="_blank" rel="noopener">UKClimbing.com</a> — searched live, tap through for routes &amp; conditions.
         </div>
       </div>`;
     const input = sheet.querySelector("#crag-q");
-    const run = () => {
-      const q = (input.value || "").trim();
-      if (q.length < 2) return;
-      sheet.classList.remove("open");
-      S.iab.open("https://www.ukclimbing.com/logbook/crags/?name=" + encodeURIComponent(q),
-                 `UKC — "${q.replace(/[<>]/g, "")}"`);
-    };
+    const run = () => runCragSearch(input.value, sheet.querySelector("#crag-results"));
     sheet.querySelector("#crag-go").addEventListener("click", run);
     input.addEventListener("keydown", (e) => { if (e.key === "Enter") run(); });
     input.focus();
+  }
+
+  async function runCragSearch(q, box) {
+    q = (q || "").trim();
+    if (q.length < 2 || !box) return;
+    box.innerHTML = `<div class="sheet-state"><div class="spinner"></div>Searching UKC…</div>`;
+    let d = null;
+    try { d = await (await fetch(S.url("api/ukc?q=" + encodeURIComponent(q)))).json(); } catch {}
+    if (!d || !d.parsed) {
+      box.innerHTML = `<div class="sheet-state">Couldn't reach UKC — try again, or search ukclimbing.com directly.</div>`;
+      return;
+    }
+    if (!d.results.length) {
+      box.innerHTML = `<div class="sheet-state">No UK crags matched "${q.replace(/[<>]/g, "")}".</div>`;
+      return;
+    }
+    box.innerHTML = d.results.map((c, i) => `
+      <button class="crag-result" data-i="${i}">
+        <span class="crag-result-name">⚒ ${c.name}</span>
+        <span class="crag-result-meta">${c.area} · ${c.routes} routes</span>
+      </button>`).join("");
+    box.querySelectorAll(".crag-result").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const c = d.results[Number(btn.dataset.i)];
+        if (searchMarker && map) { map.removeLayer(searchMarker); searchMarker = null; }
+        const icon = L.divIcon({
+          className: "peak-pin crag-pin custom-pin",
+          html: `<span class="peak-dot"></span><span class="peak-label">${c.name}</span>`,
+          iconSize: [10, 10], iconAnchor: [5, 5],
+        });
+        searchMarker = L.marker([c.lat, c.lon], { icon, title: c.name }).addTo(map);
+        searchMarker.on("click", () => openCrag({ ...c, fromSearch: true }));
+        map.setView([c.lat, c.lon], Math.max(map.getZoom(), 12), { animate: true });
+        openCrag({ ...c, fromSearch: true });
+      });
+    });
   }
 
   // Open a crag (Phase 5b): name + route count, link to its UKC page in the
@@ -549,6 +578,23 @@
           Tap through for routes, logbooks and live condition reports.
         </div>
       </div>`;
+    if (c.fromSearch) {
+      const links = sheet.querySelector(".fc-links");
+      const a = document.createElement("a");
+      a.className = "fc-link";
+      a.id = "crag-keep";
+      a.textContent = "📍 Keep as a My Pin";
+      links.appendChild(a);
+      a.addEventListener("click", () => {
+        const pins = S.store.get("my-pins", []) || [];
+        pins.push({ id: Date.now(), name: c.name.replace(/[<>]/g, ""), kind: "crag", lat: c.lat, lon: c.lon });
+        S.store.set("my-pins", pins);
+        sheet.classList.remove("open");
+        if (searchMarker && map) { map.removeLayer(searchMarker); searchMarker = null; }
+        refreshLayerFor("crag");
+        S.toast(`⚒ ${c.name} pinned`);
+      });
+    }
     sheet.querySelector("#crag-ukc").addEventListener("click", () => S.iab.open(url, `${c.name} — UKC`));
     sheet.querySelector("#crag-investigate").addEventListener("click", () => {
       map.setView([c.lat, c.lon], Math.max(map.getZoom(), 11), { animate: true });
@@ -765,6 +811,7 @@
   function teardown() {
     removeSaisBanner();
     saisLayer = null;
+    searchMarker = null;
     if (map) { map.remove(); map = null; }
     for (const k in layers) delete layers[k];
   }

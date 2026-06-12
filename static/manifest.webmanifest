@@ -1,0 +1,15 @@
+{
+  "name": "Skyward — Understand the Elements",
+  "short_name": "Skyward",
+  "description": "Mountain weather education for UK hikers and climbers: forecasts, maps, webcams, avalanche reports and a learning library.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#f4f1ea",
+  "theme_color": "#f4f1ea",
+  "icons": [
+    { "src": "static/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "static/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "static/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -592,22 +592,6 @@ async def root():
     return FileResponse(str(INDEX))
 
 
-# PWA plumbing: both files must be served from the app ROOT (not /static/...)
-# so the service worker's scope covers the whole app and the manifest's
-# relative start_url resolves to "/" on the Mac and "/skyward/" on the Pi
-# (Tailscale strips the prefix, so from here both are just "/").
-@app.get("/manifest.webmanifest")
-async def manifest():
-    return FileResponse(str(STATIC_DIR / "manifest.webmanifest"),
-                        media_type="application/manifest+json")
-
-
-@app.get("/sw.js")
-async def service_worker():
-    return FileResponse(str(STATIC_DIR / "sw.js"),
-                        media_type="application/javascript")
-
-
 @app.get("/{full_path:path}")
 async def spa_fallback(full_path: str):
     """SPA fallback: unknown non-API, non-static paths return index.html so
