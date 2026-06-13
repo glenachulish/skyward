@@ -306,10 +306,29 @@ def _parse_mwis(md: str) -> dict:
     # Split into day blocks on "Viewing Forecast For".
     day_blocks = re.split(r"####\s+Viewing Forecast For", md)
     days = []
-    for block in day_blocks[1:]:
-        # First bold lines carry the area + date.
+    for i, block in enumerate(day_blocks[1:]):
+        # The day's date. Three methods, most-specific first:
+        #  (a) legacy: the first two bold lines carried area + date (matched
+        #      the 2026-06-07 markup; MWIS later dropped the bold tags);
+        #  (b) the visible date text itself — "Friday 12th June 2026" — near
+        #      the top of the block, independent of whatever tags carry it;
+        #  (c) positional "Day 1/2/3", so a day can NEVER render unlabelled
+        #      (three unlabelled blocks read as the same forecast repeated).
+        date = None
         date_m = re.search(r"\*\*(.*?)\*\*\s*\n+\*\*(.*?)\*\*", block)
-        date = date_m.group(2).strip() if date_m else None
+        if date_m:
+            date = date_m.group(2).strip()
+        if not date or not re.search(r"\d", date):
+            vm = re.search(
+                r"(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\s+"
+                r"(\d{1,2}(?:st|nd|rd|th)?)\s+"
+                r"(January|February|March|April|May|June|July|August|September|October|November|December)"
+                r"(?:\s+\d{4})?",
+                block[:600], re.I)
+            if vm:
+                date = f"{vm.group(1)} {vm.group(2)} {vm.group(3)}"
+        if not date:
+            date = f"Day {i + 1}"
         fields = []
         for label in _MWIS_FIELDS:
             val = section_after(label, block)
