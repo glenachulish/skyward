@@ -805,21 +805,28 @@
       </div>
       <div class="sheet-body">
         <div class="now">
-          <div class="temp">${Math.round(cur.temperature_2m)}<small>°C</small></div>
-          <div class="stat"><b>${Math.round(cur.apparent_temperature)}°</b><span>Feels</span></div>
-          <div class="stat"><b>${Math.round(cur.wind_speed_10m)} ${compass(cur.wind_direction_10m)}</b><span>Wind mph</span></div>
-          <div class="stat"><b>${Math.round(cur.wind_gusts_10m)}</b><span>Gust mph</span></div>
+          <div class="temp ${tempBand(Math.round(cur.temperature_2m))}">${Math.round(cur.temperature_2m)}<small>°C</small></div>
+          <div class="stat"><b class="${tempBand(Math.round(cur.apparent_temperature))}">${Math.round(cur.apparent_temperature)}°</b><span>Feels</span></div>
+          <div class="stat"><b class="${windBand(Math.round(cur.wind_speed_10m))}">${Math.round(cur.wind_speed_10m)} ${compass(cur.wind_direction_10m)}</b><span>Wind mph</span></div>
+          <div class="stat"><b class="${windBand(Math.round(cur.wind_gusts_10m))}">${Math.round(cur.wind_gusts_10m)}</b><span>Gust mph</span></div>
           <div class="stat"><b>${cur.precipitation ?? 0} mm</b><span>Precip</span></div>
         </div>
 
         <div class="triad-hint">
           <div class="triad">${triad}</div>
-          <div class="expand-hint">▲ Swipe up for the hourly breakdown</div>
+          <button type="button" class="expand-hint" id="expand-toggle" aria-expanded="false">
+            ▲ Tap for the hourly breakdown
+          </button>
         </div>
 
         <div class="hourly">
+          <button type="button" class="collapse-hint" id="collapse-toggle">▼ Hide hourly</button>
           <h3>Next hours</h3>
           ${hourly}
+        </div>
+
+        <div class="fc-links">
+          <a class="fc-link" id="synoptic-chart">🌀 Synoptic (pressure) chart</a>
         </div>
 
         <div class="attribution">
@@ -831,10 +838,52 @@
 
     sheet.querySelector("#sheet-close").addEventListener("click", () => sheet.classList.remove("open"));
 
-    // Expand / collapse: tap grip toggles; also support a simple drag.
+    // Expand / collapse. The whole grip AND the big hint button toggle the
+    // hourly view — a tap works everywhere (the Mac has no swipe), and the
+    // drag below is kept as a bonus on touchscreens.
     const grip = sheet.querySelector("#grip");
-    grip.addEventListener("click", () => sheet.classList.toggle("expanded"));
-    enableDrag(sheet, grip);
+    const setExpanded = (on) => {
+      sheet.classList.toggle("expanded", on);
+      const t = sheet.querySelector("#expand-toggle");
+      if (t) t.setAttribute("aria-expanded", String(on));
+    };
+    grip.addEventListener("click", () => setExpanded(!sheet.classList.contains("expanded")));
+    sheet.querySelector("#expand-toggle").addEventListener("click", () => setExpanded(true));
+    sheet.querySelector("#collapse-toggle").addEventListener("click", () => setExpanded(false));
+    enableDrag(sheet, grip, setExpanded);
+
+    // Synoptic chart — Met Office surface-pressure analysis, opened in the
+    // in-app browser (no API key needed). Same source MWIS links to.
+    sheet.querySelector("#synoptic-chart").addEventListener("click", () =>
+      S.iab.open(
+        "https://www.metoffice.gov.uk/weather/maps-and-charts/surface-pressure",
+        "Synoptic chart — Met Office"
+      ));
+  }
+
+  // --- Data colour banding -------------------------------------------------
+  // Map a value to a CSS class. The classes resolve to the existing palette
+  // tokens (cold blues -> warm ambers/reds for temp; settled green -> red for
+  // rain & wind), so the winter re-theme is respected automatically.
+  function tempBand(t) {
+    if (t <= 0)  return "v-cold";   // freezing
+    if (t <= 4)  return "v-cool";   // near-freezing
+    if (t <= 9)  return "v-mild";
+    if (t <= 15) return "v-warm";
+    return "v-hot";
+  }
+  function rainBand(pp) {
+    if (pp >= 70) return "v-rain-high";
+    if (pp >= 40) return "v-rain-med";
+    if (pp >= 15) return "v-rain-low";
+    return "v-rain-none";
+  }
+  // Wind in mph, mountain-relevant thresholds (gusts make hills serious early).
+  function windBand(ws) {
+    if (ws >= 50) return "v-wind-severe";
+    if (ws >= 35) return "v-wind-high";
+    if (ws >= 20) return "v-wind-med";
+    return "v-wind-low";
   }
 
   function buildTriad(hourly) {
@@ -851,9 +900,9 @@
       return `
         <div class="slot">
           <div class="when">${name}</div>
-          <div class="t">${gl} ${t}°</div>
+          <div class="t ${tempBand(t)}">${gl} ${t}°</div>
           <div class="sub">${lab}</div>
-          <div class="sub">${pp}% rain${fl != null ? ` · FL ${Math.round(fl)}m` : ""}</div>
+          <div class="sub"><span class="${rainBand(pp)}">${pp}% rain</span>${fl != null ? ` · FL ${Math.round(fl)}m` : ""}</div>
         </div>`;
     }).join("");
   }
@@ -874,24 +923,24 @@
       rows.push(`
         <div class="hourly-row">
           <span class="hr">${hh}</span>
-          <span class="wx">${gl} ${t}° · ${lab}</span>
-          <span class="pp">${pp}%</span>
-          <span class="wd">${ws}${wd}</span>
+          <span class="wx"><b class="${tempBand(t)}">${gl} ${t}°</b> · ${lab}</span>
+          <span class="pp ${rainBand(pp)}">${pp}%</span>
+          <span class="wd ${windBand(ws)}">${ws}${wd}</span>
         </div>`);
     }
     return rows.join("");
   }
 
-  // Minimal vertical drag on the grip to expand/collapse the sheet.
-  function enableDrag(sheet, grip) {
+  // Minimal vertical drag on the grip to expand/collapse the sheet (touch).
+  function enableDrag(sheet, grip, setExpanded) {
     let startY = null;
     const down = (y) => { startY = y; };
     const up = (y) => {
       if (startY == null) return;
       const dy = y - startY;
-      if (dy < -40) sheet.classList.add("expanded");
+      if (dy < -40) setExpanded(true);
       else if (dy > 40) {
-        if (sheet.classList.contains("expanded")) sheet.classList.remove("expanded");
+        if (sheet.classList.contains("expanded")) setExpanded(false);
         else sheet.classList.remove("open");
       }
       startY = null;

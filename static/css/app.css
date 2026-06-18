@@ -289,9 +289,23 @@ html, body {
 .triad .slot .sub { font-size: .72rem; color: var(--ink-dim); }
 
 .expand-hint {
-  text-align: center; color: var(--ink-faint); font-size: .78rem;
-  padding: .3rem 0 .8rem; letter-spacing: .04em;
+  display: block; width: 100%;
+  text-align: center; color: var(--accent); font-size: .82rem;
+  padding: .7rem 0 .8rem; letter-spacing: .04em;
+  background: var(--bg-raised); border: 1px solid var(--line-soft);
+  border-radius: var(--radius-sm); cursor: pointer;
+  font-family: inherit;
 }
+.expand-hint:hover { background: var(--bg-hover); }
+
+.collapse-hint {
+  display: block; width: 100%;
+  text-align: center; color: var(--ink-faint); font-size: .8rem;
+  padding: .5rem 0 .7rem; letter-spacing: .04em;
+  background: none; border: none; cursor: pointer;
+  font-family: inherit;
+}
+.collapse-hint:hover { color: var(--ink-dim); }
 
 /* Hourly table (revealed on expand) */
 .hourly { display: none; }
@@ -304,8 +318,42 @@ html, body {
 }
 .hourly-row .hr { font-family: var(--display); font-weight: 600; color: var(--ink-dim); }
 .hourly-row .wx { color: var(--ink); }
-.hourly-row .pp { color: var(--accent-deep); font-variant-numeric: tabular-nums; }
-.hourly-row .wd { color: var(--ink-dim); font-variant-numeric: tabular-nums; }
+.hourly-row .pp { font-variant-numeric: tabular-nums; font-weight: 600; }
+.hourly-row .wd { font-variant-numeric: tabular-nums; font-weight: 600; }
+
+/* ---- Data colour bands -------------------------------------------------
+   Shared by the Investigate sheet (now / triad / hourly). Temperature runs
+   cold blue -> hot red; rain & wind run settled green -> alarming red, reusing
+   the hazard tokens. All are deliberately strong for outdoor legibility. */
+:root {
+  --t-cold: #3f6fb0;   /* sub-zero      */
+  --t-cool: #5a92b8;   /* 1–4°          */
+  --t-mild: #5f8a82;   /* 5–9°          */
+  --t-warm: #c98a3a;   /* 10–15°        */
+  --t-hot:  #cf5b53;   /* 16°+          */
+}
+body.winter {
+  /* In winter the cold end carries more weight; warm end cools slightly. */
+  --t-cold: #2f63ad;
+  --t-cool: #4f8fc4;
+}
+
+.v-cold { color: var(--t-cold) !important; }
+.v-cool { color: var(--t-cool) !important; }
+.v-mild { color: var(--t-mild) !important; }
+.v-warm { color: var(--t-warm) !important; }
+.v-hot  { color: var(--t-hot)  !important; }
+
+.v-rain-none { color: var(--ink-faint) !important; }
+.v-rain-low  { color: var(--accent)    !important; }
+.v-rain-med  { color: var(--warn)      !important; }
+.v-rain-high { color: var(--danger)    !important; }
+
+.v-wind-low    { color: var(--ink-dim) !important; }
+.v-wind-med    { color: var(--warn)    !important; }
+.v-wind-high   { color: var(--high)    !important; }
+.v-wind-severe { color: var(--danger)  !important; }
+
 
 /* Attribution footer in panels */
 .attribution {
@@ -419,15 +467,15 @@ html, body {
   margin: .5rem 0 .8rem; padding: .6rem .8rem; background: var(--bg); border-radius: var(--radius-sm);
   border-left: 3px solid var(--accent);
 }
-.fc-summary { color: var(--ink-dim); font-size: .88rem; line-height: 1.5; margin-bottom: 1rem; }
-.fc-day { padding-top: .8rem; margin-top: .8rem; border-top: 1px solid var(--line-soft); }
-.fc-date { font-family: var(--display); font-weight: 700; font-size: 1.05rem; color: var(--accent-deep); margin-bottom: .6rem; }
+.fc-summary { color: var(--ink); font-size: .88rem; line-height: 1.5; margin-bottom: 1rem; }
+.fc-day { padding-top: .9rem; margin-top: .9rem; border-top: 2px solid var(--line); }
+.fc-date { font-family: var(--display); font-weight: 700; font-size: 1.1rem; color: var(--accent-deep); margin-bottom: .6rem; }
 .fc-field { margin-bottom: .7rem; }
 .fc-label {
   font-family: var(--display); text-transform: uppercase; letter-spacing: .08em;
-  font-size: .74rem; color: var(--accent); font-weight: 600; margin-bottom: .15rem;
+  font-size: .76rem; color: var(--accent-deep); font-weight: 700; margin-bottom: .15rem;
 }
-.fc-text { color: var(--ink); font-size: .9rem; line-height: 1.5; }
+.fc-text { color: var(--ink); font-size: .92rem; line-height: 1.55; }
 .fc-outlook { margin-top: 1rem; padding-top: .9rem; border-top: 1px solid var(--line-soft); }
 .fc-outlook h3 { font-family: var(--display); font-size: .85rem; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-dim); margin-bottom: .4rem; }
 .fc-outlook p { color: var(--ink-dim); font-size: .88rem; line-height: 1.55; }
