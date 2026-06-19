@@ -3,7 +3,7 @@
  * through Skyward.routePath(), so the same code runs at "/" on the Mac and
  * "/skyward/" on the Pi with no edits.
  *
- * Routes: "" (map / home), "webcams", "library".
+ * Routes: "" (map / home), "forecast", "webcams", "library".
  */
 (function () {
   const S = window.Skyward;
@@ -107,6 +107,12 @@
 
   // Public helper for contextual "What's This?" jumps from the map.
   S.openLibrary = (module, topic) => go("library", true, { module, topic });
+
+  // Public helper so the map's "Forecast here" button can jump to the Forecast
+  // tab focused on a specific area. Mirrors S.openLibrary exactly: same router,
+  // same shape. `src` defaults to "metoffice" (the by-numbers 5-day source the
+  // map button targets); pass "mwis" to land on the worded source instead.
+  S.openForecast = (area, src) => go("forecast", true, { area, source: src || "metoffice" });
 
   S.toast = (msg) => {
     const t = document.getElementById("toast");

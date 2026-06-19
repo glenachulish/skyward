@@ -2,23 +2,13 @@
  * views/map.js — the home view. Full-screen Leaflet map with a centred
  * crosshair; "Investigate" fetches weather for the map centre and raises a
  * progressive bottom sheet (Morning/PM/Night summary -> swipe up for hourly).
- *
- * Two map actions sit at the bottom centre, as a pair:
- *   ⌖ Investigate   — live weather (Open-Meteo) for the exact crosshair point.
- *   ⛅ Forecast here — the Met Office 5-day forecast for the NEAREST named area
- *                      (metoffice-areas.json) to the map centre. Jumps to the
- *                      Forecast tab focused on that area via S.openForecast().
- * Both read the map CENTRE, so they never clash with left-click, right-click /
- * long-press (add a pin), or each other — there are no map-surface gestures
- * bound to either; the crosshair + buttons are the whole interaction.
  */
 (function () {
   const S = window.Skyward;
   const { wx, compass, fetchWeather } = S.weather;
 
   let map = null;
-  let areas = [];        // MWIS areas, for the "Jump to area…" select
-  let moAreas = [];      // Met Office areas, for "Forecast here" nearest-match
+  let areas = [];
 
   async function render(stage) {
     stage.innerHTML = `
@@ -50,10 +40,7 @@
           <button class="winter-toggle" id="search-btn" aria-label="Search for a place">🔍 Search</button>
         </div>
       </div>
-      <div class="fab-stack">
-        <button class="fab" id="investigate">⌖ Investigate</button>
-        <button class="fab fab-secondary" id="forecast-here">⛅ Forecast here</button>
-      </div>
+      <button class="fab" id="investigate">⌖ Investigate</button>
       <div id="sheet" aria-live="polite"></div>
     `;
 
@@ -84,14 +71,6 @@
         if (a) map.flyTo([a.lat, a.lon], 10, { duration: .8 });
       });
     } catch { /* non-fatal: jump-to just stays empty */ }
-
-    // --- Met Office areas (for "Forecast here") ------------------------------
-    // Loaded once, used to find the nearest named area to the map centre. Same
-    // file the Forecast tab uses — each area carries a lat/lon. Non-fatal: if
-    // it doesn't load, the button degrades to a gentle toast.
-    try {
-      moAreas = (await (await fetch(S.url("static/data/metoffice-areas.json"))).json()).areas || [];
-    } catch { moAreas = []; }
 
     // --- Winter toggle -------------------------------------------------------
     // Phase 5a: the SAIS avalanche overlay rides on this toggle — Winter on
@@ -149,9 +128,6 @@
     // --- Investigate ---------------------------------------------------------
     stage.querySelector("#investigate").addEventListener("click", investigate);
 
-    // --- Forecast here -------------------------------------------------------
-    stage.querySelector("#forecast-here").addEventListener("click", forecastHere);
-
     // --- Locate (geolocation) ------------------------------------------------
     stage.querySelector("#locate-btn").addEventListener("click", () => locate(true));
     // Auto-locate ONCE, then remember the choice; default centre on later loads.
@@ -169,49 +145,6 @@
     const up = stage.querySelector("#font-up");
     if (down) down.disabled = (i <= 0);
     if (up) up.disabled = (i >= last);
-  }
-
-  // --- "Forecast here" ------------------------------------------------------
-  // Find the nearest named Met Office area to the map centre and jump to the
-  // Forecast tab focused on it. Pure client-side: the areas (with lat/lon) are
-  // already loaded, so this is instant and works offline; the actual forecast
-  // fetch is the Forecast tab's existing 1-hour-cached /api/metoffice call.
-  function forecastHere() {
-    const btn = document.getElementById("forecast-here");
-    const c = map.getCenter();
-    const nearest = nearestMoArea(c.lat, c.lng);
-    if (!nearest) {
-      S.toast("Forecast areas aren't loaded yet — try again in a moment.");
-      return;
-    }
-    if (btn) {
-      btn.disabled = true;
-      setTimeout(() => { btn.disabled = false; }, 600); // re-enable after the view swap
-    }
-    S.toast(`Nearest Met Office area: ${nearest.name}`);
-    S.openForecast(nearest.id, "metoffice");
-  }
-
-  // Great-circle (Haversine) distance in km between two lat/lon points.
-  function haversineKm(lat1, lon1, lat2, lon2) {
-    const R = 6371;
-    const toRad = (deg) => (deg * Math.PI) / 180;
-    const dLat = toRad(lat2 - lat1);
-    const dLon = toRad(lon2 - lon1);
-    const a = Math.sin(dLat / 2) ** 2 +
-              Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
-    return 2 * R * Math.asin(Math.sqrt(a));
-  }
-
-  // Nearest Met Office area to a point, or null if none are loaded.
-  function nearestMoArea(lat, lon) {
-    let best = null, bestD = Infinity;
-    for (const a of moAreas) {
-      if (a.lat == null || a.lon == null) continue;
-      const d = haversineKm(lat, lon, a.lat, a.lon);
-      if (d < bestD) { bestD = d; best = a; }
-    }
-    return best;
   }
 
   // Centre the map on the device location. `userInitiated` controls messaging:
@@ -952,11 +885,6 @@
     if (ws >= 20) return "v-wind-med";
     return "v-wind-low";
   }
-
-  // Expose the bands so OTHER views (e.g. the Forecast tab's Met Office cards)
-  // colour their numbers with the IDENTICAL thresholds and classes — one source
-  // of truth, so a temperature reads the same colour everywhere in the app.
-  S.bands = { temp: tempBand, rain: rainBand, wind: windBand };
 
   function buildTriad(hourly) {
     if (!hourly || !hourly.time) return "";

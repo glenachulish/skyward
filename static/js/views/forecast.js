@@ -209,37 +209,95 @@
     });
   }
 
+  // Map the Met Office's WORDED condition (the backend turns its numeric
+  // significant-weather code into a phrase like "Cloudy" / "Heavy rain" /
+  // "Partly cloudy") to the SAME emoji glyph set the Investigate triad uses
+  // (via wx() in weather.js), so a given sky reads the same in both views.
+  // Keyword-based so it stays correct if the backend adds a new phrasing.
+  function moGlyph(s) {
+    const w = String(s || "").toLowerCase();
+    if (w.includes("thunder")) return "⛈";
+    if (w.includes("snow") || w.includes("sleet") || w.includes("hail")) return "🌨";
+    if (w.includes("heavy rain") || w.includes("heavy drizzle")) return "🌧";
+    if (w.includes("rain") || w.includes("drizzle") || w.includes("shower")) return "🌦";
+    if (w.includes("fog") || w.includes("mist")) return "🌫";
+    if (w.includes("overcast")) return "☁";
+    if (w.includes("partly") && w.includes("cloud")) return "⛅";
+    if (w.includes("cloud")) return "☁";
+    if (w.includes("sunny")) return "☀";
+    if (w.includes("clear") && w.includes("night")) return "🌙";
+    if (w.includes("clear")) return "☀";
+    if (w.includes("night")) return "🌙";
+    return "·"; // unknown / "Not available" — same neutral mark wx() uses
+  }
+
+  // One Met Office day, styled to match the Investigate triad: an elevated
+  // panel with a weather GLYPH beside the band-coloured HERO temperature (the
+  // day's high), the low + feels-like alongside, then wind / rain / UV as a row
+  // of coloured figures in sunk cells. The colour bands are the app-wide ones
+  // (defined in map.js, shared via S.bands) so a temperature reads the SAME
+  // colour here as on the Investigate sheet. Safe fallback to no class if bands
+  // aren't available for any reason.
   function moDayRow(d) {
     const date = d.date ? fmtDate(d.date) : "";
-    // Reuse the app-wide colour bands (defined in map.js, shared via S.bands)
-    // so temp/wind/rain read the same colour here as on the Investigate sheet.
-    // Safe fallback to no class if bands aren't available for any reason.
     const B = (S.bands) || {};
     const tempCls = (v) => (B.temp && v != null) ? B.temp(v) : "";
     const windCls = (v) => (B.wind && v != null) ? B.wind(v) : "";
     const rainCls = (v) => (B.rain && v != null) ? B.rain(v) : "";
 
     const tMax = d.temp_max, tMin = d.temp_min;
-    const temp = (tMax != null ? `<span class="${tempCls(tMax)}">${tMax}°</span>` : "–") +
-                 (tMin != null ? ` / <span class="${tempCls(tMin)}">${tMin}°</span>` : "");
+    const glyph = moGlyph(d.wx_day);
+
+    // HERO: the day's high temperature, big and band-coloured. Low rides
+    // alongside it in a quieter weight. If there's no high, fall back to a dash.
+    const hero = (tMax != null)
+      ? `<span class="fc-mo-d2-temp ${tempCls(tMax)}">${tMax}<span class="fc-mo-d2-deg">°</span></span>`
+      : `<span class="fc-mo-d2-temp">–</span>`;
+    const lo = (tMin != null)
+      ? `<span class="fc-mo-lo">low <b class="${tempCls(tMin)}">${tMin}°</b></span>`
+      : "";
+
+    // Feels-like, shown beside the hero as coloured figures when present.
     const feels = (d.feels_max != null || d.feels_min != null)
-      ? `feels ${d.feels_max != null ? `<span class="${tempCls(d.feels_max)}">${d.feels_max}°</span>` : "–"}${d.feels_min != null ? ` / <span class="${tempCls(d.feels_min)}">${d.feels_min}°</span>` : ""}`
+      ? `<span class="fc-mo-feels">feels ${
+          d.feels_max != null ? `<b class="${tempCls(d.feels_max)}">${d.feels_max}°</b>` : "–"
+        }${
+          d.feels_min != null ? ` / <b class="${tempCls(d.feels_min)}">${d.feels_min}°</b>` : ""
+        }</span>`
       : "";
+
+    // Wind: direction + speed + gust, the speed band-coloured.
     const wind = d.wind_day != null
-      ? `<span class="${windCls(d.wind_day)}">${d.wind_dir_day ? d.wind_dir_day + " " : ""}${d.wind_day}${d.gust_day != null ? `<span class="fc-mo-gust"> g${d.gust_day}</span>` : ""} mph</span>`
-      : "";
+      ? `<b class="${windCls(d.wind_day)}">${d.wind_dir_day ? d.wind_dir_day + " " : ""}${d.wind_day}${
+          d.gust_day != null ? `<span class="fc-mo-gust"> g${d.gust_day}</span>` : ""
+        }</b> <span class="fc-mo-unit">mph</span>`
+      : "–";
+
+    // Rain: probability, band-coloured.
     const pop = d.precip_prob_day != null
-      ? `<span class="${rainCls(d.precip_prob_day)}">${d.precip_prob_day}%</span>`
-      : "";
+      ? `<b class="${rainCls(d.precip_prob_day)}">${d.precip_prob_day}%</b>`
+      : "–";
+
+    const uv = d.uv != null ? `<b>${d.uv}</b>` : "–";
+
     return `
-      <div class="fc-mo-day">
-        <div class="fc-mo-date">${date}</div>
-        <div class="fc-mo-wx">${d.wx_day ? escapeHtml(d.wx_day) : ""}</div>
-        <div class="fc-mo-grid">
-          <div class="fc-mo-cell"><span class="fc-mo-k">Temp</span><span class="fc-mo-v">${temp}</span>${feels ? `<span class="fc-mo-sub">${feels}</span>` : ""}</div>
-          <div class="fc-mo-cell"><span class="fc-mo-k">Wind</span><span class="fc-mo-v">${wind || "–"}</span></div>
-          <div class="fc-mo-cell"><span class="fc-mo-k">Rain</span><span class="fc-mo-v">${pop || "–"}</span></div>
-          <div class="fc-mo-cell"><span class="fc-mo-k">UV</span><span class="fc-mo-v">${d.uv != null ? d.uv : "–"}</span></div>
+      <div class="fc-mo-day2">
+        <div class="fc-mo-d2-head">
+          <span class="fc-mo-d2-date">${date}</span>
+          ${d.wx_day ? `<span class="fc-mo-d2-cond">${escapeHtml(d.wx_day)}</span>` : ""}
+        </div>
+        <div class="fc-mo-d2-hero">
+          <span class="fc-mo-d2-glyph" aria-hidden="true">${glyph}</span>
+          ${hero}
+          <span class="fc-mo-d2-side">
+            ${lo}
+            ${feels}
+          </span>
+        </div>
+        <div class="fc-mo-d2-figs">
+          <div class="fc-mo-fig"><span class="fc-mo-k">Wind</span><span class="fc-mo-figv">${wind}</span></div>
+          <div class="fc-mo-fig"><span class="fc-mo-k">Rain</span><span class="fc-mo-figv">${pop}</span></div>
+          <div class="fc-mo-fig"><span class="fc-mo-k">UV</span><span class="fc-mo-figv">${uv}</span></div>
         </div>
       </div>`;
   }
