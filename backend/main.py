@@ -16,6 +16,7 @@ Then open http://localhost:8005/
 """
 from pathlib import Path
 import json
+import os
 import re
 import time
 
@@ -121,6 +122,228 @@ def _attribution() -> dict:
         "url": "https://open-meteo.com/",
         "licence": "CC BY 4.0",
     }
+
+
+# --- Met Office 5-day area forecasts (Site-Specific Global Spot) ---------------
+# A SEPARATE forecast source from MWIS, surfaced in the Forecast tab clearly
+# badged "Met Office". Uses the Met Office Weather DataHub "Global Spot" daily
+# API: GeoJSON, 7 days (1 past + 6 future), for any lat/lon (it snaps to the
+# nearest of its forecast sites and tells us where in the response).
+#
+# The API key is PRIVATE: read from the METOFFICE_API_KEY environment variable,
+# sent server-side in the 'apikey' header, and NEVER exposed to the browser
+# (same proxy pattern as every other source here). Set it on the Mac in
+# ~/.zshrc and on the Pi in the systemd unit (see PI-INFRASTRUCTURE.md).
+#
+# Respectful use: results cached in-process for an hour (the free plan allows
+# 360 calls/day; with ~20 areas and a 1h cache we use a tiny fraction). Degrades
+# gracefully: if the key is missing or the call fails, we return parsed:false
+# with the public Met Office page URL so the frontend can offer the live site.
+
+METOFFICE_DAILY_URL = "https://data.hub.api.metoffice.gov.uk/sitespecific/v0/point/daily"
+METOFFICE_PUBLIC = "https://weather.metoffice.gov.uk/forecast"
+_metoffice_cache: dict[str, tuple[float, dict]] = {}
+_METOFFICE_TTL = 3600  # seconds
+
+# Met Office "significant weather code" -> short human label. Codes are stable
+# and documented; we keep the common set and fall back to the raw code.
+_MO_WX = {
+    "NA": "Not available",
+    "-1": "Trace rain",
+    "0": "Clear night", "1": "Sunny",
+    "2": "Partly cloudy (night)", "3": "Partly cloudy",
+    "5": "Mist", "6": "Fog",
+    "7": "Cloudy", "8": "Overcast",
+    "9": "Light rain shower (night)", "10": "Light rain shower",
+    "11": "Drizzle", "12": "Light rain",
+    "13": "Heavy rain shower (night)", "14": "Heavy rain shower", "15": "Heavy rain",
+    "16": "Sleet shower (night)", "17": "Sleet shower", "18": "Sleet",
+    "19": "Hail shower (night)", "20": "Hail shower", "21": "Hail",
+    "22": "Light snow shower (night)", "23": "Light snow shower", "24": "Light snow",
+    "25": "Heavy snow shower (night)", "26": "Heavy snow shower", "27": "Heavy snow",
+    "28": "Thunder shower (night)", "29": "Thunder shower", "30": "Thunder",
+}
+
+
+def _load_metoffice_areas() -> tuple[list[dict], dict]:
+    raw = json.loads((DATA_DIR / "metoffice-areas.json").read_text())
+    return raw.get("areas", []), raw.get("attribution", {})
+
+
+def _mo_round(v, nd=0):
+    """Round numbers softly; pass through None/strings untouched."""
+    if v is None:
+        return None
+    try:
+        f = float(v)
+        return int(round(f)) if nd == 0 else round(f, nd)
+    except (TypeError, ValueError):
+        return v
+
+
+def _mo_wx_label(code) -> "str | None":
+    if code is None:
+        return None
+    return _MO_WX.get(str(code), f"Code {code}")
+
+
+def _parse_metoffice_daily(geo: dict) -> dict:
+    """
+    Turn the Global Spot DAILY GeoJSON into clean per-day cards.
+
+    Shape (documented): a FeatureCollection with one Feature; its
+    properties.timeSeries is a list of day objects keyed by 'time' (ISO date)
+    plus day*/night* parameters. We read defensively — the daily feed carries
+    41 parameters and field names occasionally evolve, so every field is
+    .get()'d and missing ones simply don't render. We surface the headline
+    numbers a hillwalker scans: max/min temp, feels-like, wind + gust + dir,
+    precip probability, UV, and the weather-type label, split day vs night.
+    """
+    feats = geo.get("features") or []
+    if not feats:
+        return {"location": None, "days": []}
+    props = feats[0].get("properties", {}) or {}
+    loc = props.get("location", {}) or {}
+    location = loc.get("name")
+    series = props.get("timeSeries") or []
+
+    def compass(deg):
+        if deg is None:
+            return None
+        try:
+            dirs = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE",
+                    "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"]
+            return dirs[int((float(deg) % 360) / 22.5 + 0.5) % 16]
+        except (TypeError, ValueError):
+            return None
+
+    days = []
+    for d in series:
+        # The daily feed returns one PAST day first (dated yesterday), which
+        # carries only night* fields — no day* half. Skip any record without a
+        # day half so the forecast starts cleanly on today, not a blank card.
+        if not any(k.startswith("day") for k in d):
+            continue
+        date = d.get("time")            # e.g. "2026-06-18T00:00Z"
+        day = {
+            "date": date,
+            "wx_day": _mo_wx_label(d.get("daySignificantWeatherCode")),
+            "wx_night": _mo_wx_label(d.get("nightSignificantWeatherCode")),
+            "temp_max": _mo_round(d.get("dayMaxScreenTemperature")),
+            "temp_min": _mo_round(d.get("nightMinScreenTemperature")),
+            "feels_max": _mo_round(d.get("dayMaxFeelsLikeTemp")),
+            "feels_min": _mo_round(d.get("nightMinFeelsLikeTemp")),
+            "wind_day": _mo_round(d.get("midday10MWindSpeed")),
+            "gust_day": _mo_round(d.get("midday10MWindGust")),
+            "wind_dir_day": compass(d.get("midday10MWindDirection")),
+            "wind_night": _mo_round(d.get("midnight10MWindSpeed")),
+            "gust_night": _mo_round(d.get("midnight10MWindGust")),
+            "wind_dir_night": compass(d.get("midnight10MWindDirection")),
+            "precip_prob_day": _mo_round(d.get("dayProbabilityOfPrecipitation")),
+            "precip_prob_night": _mo_round(d.get("nightProbabilityOfPrecipitation")),
+            "uv": _mo_round(d.get("maxUvIndex")),
+        }
+        # Wind from the API is m/s; convert to mph to match the rest of the app.
+        for k in ("wind_day", "gust_day", "wind_night", "gust_night"):
+            if isinstance(day[k], (int, float)):
+                day[k] = int(round(day[k] * 2.2369363))
+        days.append(day)
+
+    return {"location": location, "days": days}
+
+
+@app.get("/api/metoffice")
+async def metoffice(area: str = Query(..., min_length=2, max_length=64)):
+    """
+    Met Office Global Spot DAILY 5-day forecast for one named area
+    (see metoffice-areas.json). Returns cleaned per-day cards, always badged
+    Met Office, with a link to the public forecast page. Falls back with
+    parsed:false + the public URL if the key is missing or the call fails.
+    """
+    areas, attribution_base = _load_metoffice_areas()
+    meta = next((a for a in areas if a["id"] == area), None)
+    if not meta:
+        raise HTTPException(status_code=404, detail="Unknown Met Office area")
+
+    public_url = _metoffice_public_url(meta)
+    attribution = dict(attribution_base) or {
+        "name": "Met Office", "url": "https://www.metoffice.gov.uk/",
+        "licence": "© Crown copyright, Met Office.",
+    }
+    attribution["url"] = public_url
+
+    # Serve from cache if fresh.
+    now = time.time()
+    cached = _metoffice_cache.get(area)
+    if cached and now - cached[0] < _METOFFICE_TTL:
+        return cached[1]
+
+    api_key = os.environ.get("METOFFICE_API_KEY")
+    if not api_key:
+        # Key not configured on this host: tell the frontend to offer the page.
+        return {"area": meta["name"], "parsed": False, "source_url": public_url,
+                "attribution": attribution,
+                "error": "Met Office API key not configured on the server."}
+
+    params = {
+        "latitude": meta["lat"],
+        "longitude": meta["lon"],
+        "excludeParameterMetadata": "true",
+        "includeLocationName": "true",
+    }
+    try:
+        async with httpx.AsyncClient(timeout=12.0) as client:
+            r = await client.get(
+                METOFFICE_DAILY_URL,
+                params=params,
+                headers={"apikey": api_key, "accept": "application/json"},
+            )
+            r.raise_for_status()
+            geo = r.json()
+    except httpx.HTTPStatusError as e:
+        code = e.response.status_code
+        msg = ("Daily request limit reached — try later." if code == 429
+               else f"Met Office service error ({code}).")
+        return {"area": meta["name"], "parsed": False, "source_url": public_url,
+                "attribution": attribution, "error": msg}
+    except httpx.HTTPError:
+        return {"area": meta["name"], "parsed": False, "source_url": public_url,
+                "attribution": attribution, "error": "Could not reach the Met Office."}
+
+    forecast = _parse_metoffice_daily(geo)
+    ok = bool(forecast["days"])
+
+    payload = {
+        "area": meta["name"],
+        "parsed": ok,
+        "forecast": forecast if ok else None,
+        "source_url": public_url,
+        "attribution": attribution,
+    }
+    if ok:
+        _metoffice_cache[area] = (now, payload)
+    return payload
+
+
+def _metoffice_public_url(meta: dict) -> str:
+    """A public Met Office forecast link for this area.
+
+    Met Office public forecast pages are keyed by OPAQUE location IDs
+    (e.g. /forecast/gfh75zeru), not by place-name slugs, so we cannot build a
+    direct deep-link from a name. Two cases:
+      • if the area record carries a known 'mo_id', deep-link straight to it;
+      • otherwise link to the Met Office search page pre-filled with the area
+        name, which reliably lands the user on the right place in one tap.
+    To upgrade any area to a direct link later, look up its page on
+    weather.metoffice.gov.uk and paste the trailing ID into the JSON as
+    "mo_id": "gfh75zeru".
+    """
+    mo_id = meta.get("mo_id")
+    if mo_id:
+        return f"{METOFFICE_PUBLIC}/{mo_id}"
+    from urllib.parse import quote
+    name = re.sub(r"\s*\(.*?\)\s*$", "", meta["name"]).strip()
+    return f"{METOFFICE_PUBLIC}/search?query={quote(name)}"
 
 
 # --- Reverse geocoding (place names) -----------------------------------------

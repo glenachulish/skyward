@@ -721,3 +721,133 @@ body.winter .module-head .num { color: #fff; }
 .crag-result:hover { border-color: var(--accent); }
 .crag-result-name { font-weight: 600; }
 .crag-result-meta { font-size: .8rem; opacity: .7; white-space: nowrap; }
+
+/* ============================================================================
+   FORECAST TAB — Met Office 5-day source (added Session 8)
+   Appended block. Uses existing palette vars only; nothing above is changed.
+   ========================================================================== */
+
+/* Segmented source toggle: MWIS | Met Office */
+.fc-source-toggle {
+  display: flex;
+  gap: .4rem;
+  margin-bottom: 1rem;
+  background: var(--surface, #fff);
+  border: 1px solid var(--line-soft, #e4e0d7);
+  border-radius: var(--radius);
+  padding: .3rem;
+}
+.fc-src-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .1rem;
+  padding: .5rem .4rem;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--ink-dim);
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.fc-src-btn small {
+  font-family: var(--body);
+  font-weight: 400;
+  font-size: .72rem;
+  color: var(--ink-faint);
+  letter-spacing: .01em;
+}
+.fc-src-btn.active {
+  background: var(--accent);
+  color: #fff;
+}
+.fc-src-btn.active small { color: rgba(255,255,255,.85); }
+
+/* "Source: …" badge on every detail card */
+.fc-badge {
+  display: inline-block;
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: .72rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  padding: .2rem .6rem;
+  border-radius: 100px;
+  margin-bottom: .6rem;
+}
+.fc-badge-mwis { background: rgba(90,125,154,.14);  color: var(--accent-deep); }
+.fc-badge-mo   { background: rgba(95,138,130,.16);   color: var(--accent2); }
+
+/* Nation group headers in the Met Office area list */
+.fc-group-head {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: .78rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin: .8rem .2rem .35rem;
+}
+.fc-group-head:first-child { margin-top: 0; }
+
+/* Met Office "nearest forecast site" note */
+.fc-mo-site {
+  font-size: .82rem;
+  color: var(--ink-dim);
+  margin-bottom: .8rem;
+}
+
+/* Met Office per-day rows */
+.fc-mo-days { display: flex; flex-direction: column; }
+.fc-mo-day {
+  padding-top: .7rem;
+  margin-top: .7rem;
+  border-top: 1px solid var(--line-soft, #e4e0d7);
+}
+.fc-mo-day:first-child { border-top: 0; margin-top: 0; padding-top: 0; }
+.fc-mo-date {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 1.02rem;
+  color: var(--accent-deep);
+}
+.fc-mo-wx {
+  font-size: .85rem;
+  color: var(--ink-dim);
+  margin-bottom: .5rem;
+}
+.fc-mo-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: .45rem;
+}
+.fc-mo-cell {
+  display: flex;
+  flex-direction: column;
+  gap: .05rem;
+  background: var(--surface-sunk, rgba(47,58,66,.04));
+  border-radius: var(--radius-sm);
+  padding: .45rem .5rem;
+}
+.fc-mo-k {
+  font-size: .68rem;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--ink-faint);
+}
+.fc-mo-v {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: .98rem;
+  color: var(--ink);
+}
+.fc-mo-sub { font-size: .7rem; color: var(--ink-dim); }
+.fc-mo-gust { color: var(--ink-faint); font-weight: 400; }
+
+@media (max-width: 380px) {
+  .fc-mo-grid { grid-template-columns: repeat(2, 1fr); }
+}

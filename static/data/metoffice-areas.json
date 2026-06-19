@@ -1,0 +1,55 @@
+{
+  "_comment": "Named UK areas for the Met Office Global Spot 5-day forecast. DELIBERATELY independent of mwis-areas.json: the Forecast tab presents Met Office and MWIS as two separate, clearly-labelled sources. Each area is a representative point (lat/lon) the Met Office Site-Specific API resolves to its nearest forecast site. Grouped loosely by nation so the UI can show headers; add/remove freely. Coordinates are settlement/centre points, not summits, so the forecast reads as an AREA forecast for that locale.",
+  "attribution": {
+    "name": "Met Office",
+    "url": "https://www.metoffice.gov.uk/",
+    "licence": "© Crown copyright, Met Office — used with attribution under the Weather DataHub terms; visit the source."
+  },
+  "areas": [
+    { "id": "fortwilliam",   "name": "Fort William",            "group": "Scottish Highlands", "lat": 56.8198, "lon": -5.1052 },
+    { "id": "glencoe",       "name": "Glencoe",                 "group": "Scottish Highlands", "lat": 56.6868, "lon": -5.1018 },
+    { "id": "aviemore",      "name": "Aviemore (Cairngorms)",   "group": "Scottish Highlands", "lat": 57.1919, "lon": -3.8255 },
+    { "id": "braemar",       "name": "Braemar",                 "group": "Scottish Highlands", "lat": 57.0064, "lon": -3.3972 },
+    { "id": "torridon",      "name": "Torridon",                "group": "Scottish Highlands", "lat": 57.5466, "lon": -5.5106 },
+    { "id": "ullapool",      "name": "Ullapool (Assynt)",       "group": "Scottish Highlands", "lat": 57.8951, "lon": -5.1593 },
+    { "id": "kinlochleven",  "name": "Kinlochleven (Mamores)",  "group": "Scottish Highlands", "lat": 56.7136, "lon": -4.9637 },
+    { "id": "crianlarich",   "name": "Crianlarich (Southern Highlands)", "group": "Scottish Highlands", "lat": 56.3920, "lon": -4.6180 },
+    { "id": "kintail",       "name": "Kintail (Shiel Bridge)",  "group": "Scottish Highlands", "lat": 57.2160, "lon": -5.4310 },
+    { "id": "portree",       "name": "Portree (Skye)",          "group": "Scottish Highlands", "lat": 57.4125, "lon": -6.1959 },
+    { "id": "fortaugustus",  "name": "Fort Augustus (Loch Ness)", "group": "Scottish Highlands", "lat": 57.1448, "lon": -4.6805 },
+    { "id": "tyndrum",       "name": "Tyndrum (Tyndrum Hills)", "group": "Scottish Highlands", "lat": 56.4360, "lon": -4.7100 },
+
+    { "id": "fortwilliam_lochaber", "name": "Ben Nevis area (Glen Nevis)", "group": "Scottish Highlands", "lat": 56.7969, "lon": -5.0036 },
+
+    { "id": "ballater",      "name": "Ballater (Lochnagar)",    "group": "Scottish Highlands", "lat": 57.0498, "lon": -3.0386 },
+
+    { "id": "keswick",       "name": "Keswick (Lake District)", "group": "England", "lat": 54.6013, "lon": -3.1347 },
+    { "id": "ambleside",     "name": "Ambleside (Lake District)", "group": "England", "lat": 54.4287, "lon": -2.9631 },
+    { "id": "wasdale",       "name": "Wasdale (Scafell)",       "group": "England", "lat": 54.4682, "lon": -3.2978 },
+    { "id": "edale",         "name": "Edale (Peak District)",   "group": "England", "lat": 53.3661, "lon": -1.8163 },
+    { "id": "horton",        "name": "Horton (Yorkshire Dales)", "group": "England", "lat": 54.1490, "lon": -2.2960 },
+
+    { "id": "llanberis",     "name": "Llanberis (Snowdonia)",   "group": "Wales", "lat": 53.1180, "lon": -4.1280 },
+    { "id": "betwsycoed",    "name": "Betws-y-Coed (Snowdonia)", "group": "Wales", "lat": 53.0950, "lon": -3.8010 },
+    { "id": "brecon",        "name": "Brecon (Brecon Beacons)", "group": "Wales", "lat": 51.9486, "lon": -3.3927 },
+
+    { "id": "exeter",        "name": "Exeter (SW England)",       "group": "Regions & lowlands", "lat": 50.7184, "lon": -3.5339 },
+    { "id": "plymouth",      "name": "Plymouth (SW England)",     "group": "Regions & lowlands", "lat": 50.3755, "lon": -4.1427 },
+    { "id": "truro",         "name": "Truro (Cornwall)",          "group": "Regions & lowlands", "lat": 50.2632, "lon": -5.0510 },
+    { "id": "dartmoor",      "name": "Princetown (Dartmoor)",     "group": "Regions & lowlands", "lat": 50.5494, "lon": -3.9900 },
+    { "id": "bristol",       "name": "Bristol (SW England)",      "group": "Regions & lowlands", "lat": 51.4545, "lon": -2.5879 },
+    { "id": "london",        "name": "London (SE England)",       "group": "Regions & lowlands", "lat": 51.5074, "lon": -0.1278 },
+    { "id": "brighton",      "name": "Brighton (SE England)",     "group": "Regions & lowlands", "lat": 50.8225, "lon": -0.1372 },
+    { "id": "southampton",   "name": "Southampton (S England)",   "group": "Regions & lowlands", "lat": 50.9097, "lon": -1.4044 },
+    { "id": "norwich",       "name": "Norwich (East Anglia)",     "group": "Regions & lowlands", "lat": 52.6309, "lon": 1.2974 },
+    { "id": "cambridge",     "name": "Cambridge (East Anglia)",   "group": "Regions & lowlands", "lat": 52.2053, "lon": 0.1218 },
+    { "id": "birmingham",    "name": "Birmingham (Midlands)",     "group": "Regions & lowlands", "lat": 52.4862, "lon": -1.8904 },
+    { "id": "manchester",    "name": "Manchester (NW England)",   "group": "Regions & lowlands", "lat": 53.4808, "lon": -2.2426 },
+    { "id": "leeds",         "name": "Leeds (Yorkshire)",         "group": "Regions & lowlands", "lat": 53.8008, "lon": -1.5491 },
+    { "id": "newcastle",     "name": "Newcastle (NE England)",    "group": "Regions & lowlands", "lat": 54.9783, "lon": -1.6178 },
+    { "id": "glasgow",       "name": "Glasgow (Central Belt)",    "group": "Regions & lowlands", "lat": 55.8642, "lon": -4.2518 },
+    { "id": "edinburgh",     "name": "Edinburgh (Central Belt)",  "group": "Regions & lowlands", "lat": 55.9533, "lon": -3.1883 },
+    { "id": "belfast",       "name": "Belfast (N Ireland)",       "group": "Regions & lowlands", "lat": 54.5973, "lon": -5.9301 },
+    { "id": "cardiff",       "name": "Cardiff (S Wales)",         "group": "Regions & lowlands", "lat": 51.4816, "lon": -3.1791 }
+  ]
+}

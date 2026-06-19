@@ -886,6 +886,11 @@
     return "v-wind-low";
   }
 
+  // Expose the bands so OTHER views (e.g. the Forecast tab's Met Office cards)
+  // colour their numbers with the IDENTICAL thresholds and classes — one source
+  // of truth, so a temperature reads the same colour everywhere in the app.
+  S.bands = { temp: tempBand, rain: rainBand, wind: windBand };
+
   function buildTriad(hourly) {
     if (!hourly || !hourly.time) return "";
     const slots = [["Morning", "09:00"], ["Afternoon", "15:00"], ["Night", "21:00"]];
