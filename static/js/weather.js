@@ -31,13 +31,41 @@
     return dirs[Math.round(deg / 45) % 8];
   }
 
+  // Investigate's point forecast. PRIMARY source is the Met Office hourly
+  // product (/api/metoffice-point), shaped server-side to the SAME structure
+  // Open-Meteo returns, so the panel renders unchanged. If that call fails or
+  // hits its daily limit, fall back to Open-Meteo (/api/weather) so the sheet
+  // is never blank. The returned object is tagged `.source` ("metoffice" |
+  // "open-meteo") so the panel can badge which one is live.
   async function fetchWeather(lat, lon) {
-    const res = await fetch(url(`api/weather?lat=${lat.toFixed(4)}&lon=${lon.toFixed(4)}`));
+    const la = lat.toFixed(4), lo = lon.toFixed(4);
+
+    // 1) Try Met Office point first.
+    try {
+      const res = await fetch(url(`api/metoffice-point?lat=${la}&lon=${lo}`));
+      if (res.ok) {
+        const data = await res.json();
+        // A valid, non-oceanic Met Office reading wins.
+        if (data && data.raw && data.raw.current &&
+            data.raw.current.temperature_2m != null) {
+          data.source = "metoffice";
+          return data;
+        }
+        // Oceanic from MO: trust it (open sea is open sea) and tag it.
+        if (data && data.oceanic) { data.source = "metoffice"; return data; }
+      }
+      // Non-OK (502/429/503) -> fall through to Open-Meteo.
+    } catch { /* network error -> fall through */ }
+
+    // 2) Fall back to Open-Meteo.
+    const res = await fetch(url(`api/weather?lat=${la}&lon=${lo}`));
     if (!res.ok) {
       const detail = await res.json().catch(() => ({}));
       throw new Error(detail.detail || `Weather request failed (${res.status})`);
     }
-    return res.json();
+    const data = await res.json();
+    data.source = "open-meteo";
+    return data;
   }
 
   window.Skyward.weather = { wx, compass, fetchWeather };

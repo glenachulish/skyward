@@ -36,10 +36,12 @@ DATA_DIR = STATIC_DIR / "data"
 # config flag; the frontend keeps calling /api/weather and never sees the swap.
 OPEN_METEO_URL = "https://api.open-meteo.com/v1/forecast"
 
+
 @app.get("/api/health")
 async def health():
     """Liveness probe — also the first thing to curl after a Pi deploy."""
     return {"status": "ok", "app": "skyward"}
+
 
 @app.get("/api/weather")
 async def weather(
@@ -112,6 +114,7 @@ async def weather(
     return {"source": "open-meteo", "oceanic": False, "raw": data,
             "attribution": _attribution()}
 
+
 def _attribution() -> dict:
     """Every data response carries its source + URL (a core app requirement)."""
     return {
@@ -119,6 +122,7 @@ def _attribution() -> dict:
         "url": "https://open-meteo.com/",
         "licence": "CC BY 4.0",
     }
+
 
 # --- Met Office 5-day area forecasts (Site-Specific Global Spot) ---------------
 # A SEPARATE forecast source from MWIS, surfaced in the Forecast tab clearly
@@ -160,9 +164,11 @@ _MO_WX = {
     "28": "Thunder shower (night)", "29": "Thunder shower", "30": "Thunder",
 }
 
+
 def _load_metoffice_areas() -> tuple[list[dict], dict]:
     raw = json.loads((DATA_DIR / "metoffice-areas.json").read_text())
     return raw.get("areas", []), raw.get("attribution", {})
+
 
 def _mo_round(v, nd=0):
     """Round numbers softly; pass through None/strings untouched."""
@@ -174,10 +180,12 @@ def _mo_round(v, nd=0):
     except (TypeError, ValueError):
         return v
 
+
 def _mo_wx_label(code) -> "str | None":
     if code is None:
         return None
     return _MO_WX.get(str(code), f"Code {code}")
+
 
 def _parse_metoffice_daily(geo: dict) -> dict:
     """
@@ -258,6 +266,7 @@ def _parse_metoffice_daily(geo: dict) -> dict:
 
     return {"location": location, "days": days}
 
+
 @app.get("/api/metoffice")
 async def metoffice(area: str = Query(..., min_length=2, max_length=64)):
     """
@@ -330,6 +339,7 @@ async def metoffice(area: str = Query(..., min_length=2, max_length=64)):
         _metoffice_cache[area] = (now, payload)
     return payload
 
+
 def _metoffice_public_url(meta: dict) -> str:
     """A public Met Office forecast link for this area.
 
@@ -350,6 +360,7 @@ def _metoffice_public_url(meta: dict) -> str:
     name = re.sub(r"\s*\(.*?\)\s*$", "", meta["name"]).strip()
     return f"{METOFFICE_PUBLIC}/search?query={quote(name)}"
 
+
 # --- Reverse geocoding (place names) -----------------------------------------
 # Item: when the user Investigates a point, name it. Nominatim (OpenStreetMap)
 # does reverse lookups (lat/lon -> place) with no API key. We honour its usage
@@ -360,6 +371,7 @@ def _metoffice_public_url(meta: dict) -> str:
 NOMINATIM_URL = "https://nominatim.openstreetmap.org/reverse"
 _place_cache: dict[str, tuple[float, str | None]] = {}
 _PLACE_TTL = 24 * 3600  # seconds
+
 
 @app.get("/api/place")
 async def place(
@@ -405,6 +417,7 @@ async def place(
     _place_cache[key] = (now, name)
     return {"name": name}
 
+
 # --- Place search (forward geocoding) -----------------------------------------
 # "Type Hen Cloud, the map flies there." Nominatim's /search endpoint — the
 # forward twin of the /api/place reverse lookup above, under the same usage
@@ -413,6 +426,7 @@ async def place(
 NOMINATIM_SEARCH_URL = "https://nominatim.openstreetmap.org/search"
 _search_cache: dict[str, tuple[float, dict]] = {}
 _SEARCH_TTL = 24 * 3600
+
 
 @app.get("/api/search")
 async def place_search(q: str = Query(..., min_length=2, max_length=80)):
@@ -461,6 +475,7 @@ async def place_search(q: str = Query(..., min_length=2, max_length=80)):
     _search_cache[key] = (now, payload)
     return payload
 
+
 # --- MWIS area forecasts ------------------------------------------------------
 # MWIS (mwis.org.uk) publishes daily 3-day mountain forecasts as HTML pages
 # heavy with adverts. The brief asks for these "without all the adverts and
@@ -490,8 +505,10 @@ _MWIS_FIELDS = [
     "Freezing Level",
 ]
 
+
 def _load_areas() -> list[dict]:
     return json.loads((DATA_DIR / "mwis-areas.json").read_text()).get("areas", [])
+
 
 def _parse_mwis(md: str) -> dict:
     """
@@ -569,11 +586,13 @@ def _parse_mwis(md: str) -> dict:
         "outlook": outlook,
     }
 
+
 def _planning_outlook(md: str) -> str | None:
     m = re.search(r"###\s+Planning Outlook\s*\n+(.*?)(?=\n#{3,6}\s|\Z)", md, re.S)
     if not m:
         return None
     return re.sub(r"[ \t]+", " ", m.group(1)).strip() or None
+
 
 @app.get("/api/mwis")
 async def mwis(area: str = Query(..., min_length=2, max_length=64)):
@@ -629,6 +648,7 @@ async def mwis(area: str = Query(..., min_length=2, max_length=64)):
         _mwis_cache[area] = (now, payload)
     return payload
 
+
 def _html_to_text(html: str) -> str:
     """
     Minimal HTML -> heading-aware text. We don't pull in BeautifulSoup to keep
@@ -653,6 +673,7 @@ def _html_to_text(html: str) -> str:
     s = re.sub(r"&deg;", "°", s)
     s = re.sub(r"\n{3,}", "\n\n", s)
     return s
+
 
 # --- SAIS avalanche forecasts (Phase 5a) ---------------------------------------
 # SAIS (sais.gov.uk) publishes daily avalanche hazard reports in winter for six
@@ -679,8 +700,10 @@ _SAIS_TTL = 3 * 3600  # seconds
 _HAZARD_LEVELS = {"low": 1, "moderate": 2, "considerable": 3, "high": 4, "very high": 5}
 _HAZARD_WORDS = r"(Very High|High|Considerable|Moderate|Low)"
 
+
 def _load_sais_regions() -> list[dict]:
     return json.loads((DATA_DIR / "sais-regions.json").read_text()).get("regions", [])
+
 
 def _sais_attribution(url: str) -> dict:
     return {
@@ -688,6 +711,7 @@ def _sais_attribution(url: str) -> dict:
         "url": url,
         "licence": "© SAIS / sportscotland — used with attribution; visit the source.",
     }
+
 
 def _sais_in_season(text: str, newest: "float | None") -> bool:
     """Season test: the explicit 'finished for the winter' message wins; as a
@@ -699,6 +723,7 @@ def _sais_in_season(text: str, newest: "float | None") -> bool:
         return False
     return (time.time() - newest) <= 3 * 24 * 3600
 
+
 def _parse_uk_date(s: str) -> "float | None":
     """dd/mm/yyyy -> epoch seconds (midnight), or None."""
     m = re.match(r"(\d{2})/(\d{2})/(\d{4})", s.strip())
@@ -709,6 +734,7 @@ def _parse_uk_date(s: str) -> "float | None":
         return _dt.datetime(int(m.group(3)), int(m.group(2)), int(m.group(1))).timestamp()
     except ValueError:
         return None
+
 
 def _parse_sais_home(text: str, regions: list[dict]) -> dict:
     """Pull each region's card off the homepage text: hazard word, EAWS
@@ -751,6 +777,7 @@ def _parse_sais_home(text: str, regions: list[dict]) -> dict:
         out.append(entry)
     return {"regions": out, "newest": newest, "found": found}
 
+
 def _sais_section(text: str, heading: str) -> "str | None":
     """Grab the paragraph(s) after a literal heading LINE until the next known
     heading. SAIS heading levels vary, so we match the visible strings rather
@@ -775,6 +802,7 @@ def _sais_section(text: str, heading: str) -> "str | None":
     chunk = "\n".join(line.strip() for line in chunk.splitlines())
     return chunk.strip() or None
 
+
 def _parse_sais_region(text: str) -> dict:
     """Extract the detail card from a single region page."""
     period = None
@@ -798,6 +826,7 @@ def _parse_sais_region(text: str) -> dict:
         "comments": _sais_section(text, "Comments"),
         "finished": finished,
     }
+
 
 @app.get("/api/sais")
 async def sais(region: "str | None" = Query(None, min_length=2, max_length=64)):
@@ -863,6 +892,7 @@ async def sais(region: "str | None" = Query(None, min_length=2, max_length=64)):
         _sais_cache[cache_key] = (now, payload)
     return payload
 
+
 # --- Static frontend ----------------------------------------------------------
 # Assets live under /static/... (matching the relative paths the HTML emits:
 # "static/css/app.css" etc). The backend is prefix-naive, so these are real
@@ -871,9 +901,11 @@ app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 INDEX = STATIC_DIR / "index.html"
 
+
 @app.get("/")
 async def root():
     return FileResponse(str(INDEX))
+
 
 # PWA plumbing: both files must be served from the app ROOT (not /static/...)
 # so the service worker's scope covers the whole app and the manifest's
@@ -884,10 +916,21 @@ async def manifest():
     return FileResponse(str(STATIC_DIR / "manifest.webmanifest"),
                         media_type="application/manifest+json")
 
+
 @app.get("/sw.js")
 async def service_worker():
     return FileResponse(str(STATIC_DIR / "sw.js"),
                         media_type="application/javascript")
+
+
+@app.get("/{full_path:path}")
+async def spa_fallback(full_path: str):
+    """SPA fallback: unknown non-API, non-static paths return index.html so
+    client routing (e.g. /webcams, /library) survives a refresh."""
+    if full_path.startswith("api/") or full_path.startswith("static/"):
+        raise HTTPException(status_code=404, detail="Not found")
+    return FileResponse(str(INDEX))
+
 
 # === SKYWARD-S10: Investigate via Met Office hourly (point forecast) =========
 # Investigate now reads the Met Office Site-Specific HOURLY product for the
@@ -1084,13 +1127,3 @@ async def metoffice_point(
                             "url": "https://www.metoffice.gov.uk/",
                             "licence": "© Crown copyright, Met Office (freezing level: Open-Meteo)"}}
 # === /SKYWARD-S10 ============================================================
-
-
-@app.get("/{full_path:path}")
-async def spa_fallback(full_path: str):
-    """SPA fallback: unknown non-API, non-static paths return index.html so
-    client routing (e.g. /webcams, /library) survives a refresh."""
-    if full_path.startswith("api/") or full_path.startswith("static/"):
-        raise HTTPException(status_code=404, detail="Not found")
-    return FileResponse(str(INDEX))
-
