@@ -1114,33 +1114,3 @@ body.winter .fab.fab-secondary { color: #fff; }
   .fc-mo-d2-temp { font-size: 2.2rem; }
   .fc-mo-d2-hero { gap: .5rem; }
 }
-
-
-/* ===========================================================================
-   SESSION 10 — Investigate source badge (Met Office primary / Open-Meteo
-   fallback). Small, quiet pill in the sheet header showing which source is
-   live. Appended, marker-guarded. SKYWARD-S10-MARKER
-   ======================================================================== */
-.sheet-head-right {
-  display: flex;
-  align-items: center;
-  gap: .5rem;
-}
-.src-badge {
-  font-size: .62rem;
-  text-transform: uppercase;
-  letter-spacing: .05em;
-  font-weight: 700;
-  padding: .18rem .5rem;
-  border-radius: 100px;
-  white-space: nowrap;
-}
-.src-badge.src-mo {
-  background: rgba(95, 138, 130, .16);
-  color: var(--accent2, #5f8a82);
-}
-.src-badge.src-om {
-  background: rgba(90, 125, 154, .16);
-  color: var(--accent, #5a7d9a);
-}
-body.winter .src-badge { color: #fff; }

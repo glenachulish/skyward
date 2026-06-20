@@ -861,13 +861,6 @@
     // Hourly rows for today (next ~18 hours from now).
     const hourly = buildHourly(d.hourly);
 
-    // Which source actually answered (set by fetchWeather): Met Office point
-    // forecast is primary, Open-Meteo is the fallback. A small badge keeps it
-    // honest about what the user is reading.
-    const srcBadge = data.source === "metoffice"
-      ? `<span class="src-badge src-mo" title="Freezing level via Open-Meteo">Met Office</span>`
-      : `<span class="src-badge src-om">Open-Meteo</span>`;
-
     sheet.innerHTML = `
       <div class="sheet-grip" id="grip"><span></span></div>
       <div class="sheet-head">
@@ -875,10 +868,7 @@
           <h2>${glyph} ${label}</h2>
           <div class="coords">${coords.lat.toFixed(3)}, ${coords.lng.toFixed(3)}</div>
         </div>
-        <div class="sheet-head-right">
-          ${srcBadge}
-          <button class="sheet-close" id="sheet-close">✕</button>
-        </div>
+        <button class="sheet-close" id="sheet-close">✕</button>
       </div>
       <div class="sheet-body">
         <div class="now">
