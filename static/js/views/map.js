@@ -868,7 +868,10 @@
           <h2>${glyph} ${label}</h2>
           <div class="coords">${coords.lat.toFixed(3)}, ${coords.lng.toFixed(3)}</div>
         </div>
-        <button class="sheet-close" id="sheet-close">✕</button>
+        <div class="sheet-head-right">
+          <span class="src-badge src-om">Open-Meteo</span>
+          <button class="sheet-close" id="sheet-close">✕</button>
+        </div>
       </div>
       <div class="sheet-body">
         <div class="now">
