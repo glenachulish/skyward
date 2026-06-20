@@ -19,6 +19,7 @@
   let map = null;
   let areas = [];        // MWIS areas, for the "Jump to area…" select
   let moAreas = [];      // Met Office areas, for "Forecast here" nearest-match
+  let forecastPeaks = []; // peaks, for the "Forecast here" nearby-summits choice
 
   async function render(stage) {
     stage.innerHTML = `
@@ -92,6 +93,13 @@
     try {
       moAreas = (await (await fetch(S.url("static/data/metoffice-areas.json"))).json()).areas || [];
     } catch { moAreas = []; }
+
+    // Peaks, loaded once for the "Forecast here" choice sheet (nearby summits),
+    // independent of the ⛰ Peaks map-layer toggle. Non-fatal: if it doesn't
+    // load, the sheet simply offers the valley area with no summit options.
+    try {
+      forecastPeaks = (await (await fetch(S.url("static/data/peaks.json"))).json()).peaks || [];
+    } catch { forecastPeaks = []; }
 
     // --- Winter toggle -------------------------------------------------------
     // Phase 5a: the SAIS avalanche overlay rides on this toggle — Winter on
@@ -172,24 +180,73 @@
   }
 
   // --- "Forecast here" ------------------------------------------------------
-  // Find the nearest named Met Office area to the map centre and jump to the
-  // Forecast tab focused on it. Pure client-side: the areas (with lat/lon) are
-  // already loaded, so this is instant and works offline; the actual forecast
-  // fetch is the Forecast tab's existing 1-hour-cached /api/metoffice call.
+  // Tapping ⛅ Forecast here opens a small choice sheet for the map centre:
+  //   • the nearest Met Office named AREA (valley/general) — the default; opens
+  //     its 5-day forecast on the Forecast tab (existing /api/metoffice flow).
+  //   • up to 3 nearby PEAKS within 15 km — each opens that summit's existing
+  //     mountain-forecast.com forecast (the same openPeak() used by map pins).
+  // Pure client-side: areas and peaks are already loaded, so it's instant and
+  // works offline. No new API calls.
+  const FORECAST_PEAK_RADIUS_KM = 15;
+  const FORECAST_PEAK_MAX = 3;
+
   function forecastHere() {
-    const btn = document.getElementById("forecast-here");
     const c = map.getCenter();
-    const nearest = nearestMoArea(c.lat, c.lng);
-    if (!nearest) {
-      S.toast("Forecast areas aren't loaded yet — try again in a moment.");
+    const area = nearestMoArea(c.lat, c.lng);
+    const peaks = nearbyPeaks(c.lat, c.lng, FORECAST_PEAK_RADIUS_KM, FORECAST_PEAK_MAX);
+
+    if (!area && !peaks.length) {
+      S.toast("Forecasts aren't loaded yet — try again in a moment.");
       return;
     }
-    if (btn) {
-      btn.disabled = true;
-      setTimeout(() => { btn.disabled = false; }, 600); // re-enable after the view swap
+
+    const sheet = document.getElementById("sheet");
+    sheet.classList.add("open");
+    sheet.classList.remove("expanded");
+
+    const areaRow = area
+      ? `<a class="fc-link" id="fh-area">📋 ${area.name} — Met Office 5-day</a>`
+      : "";
+
+    const peakRows = peaks.length
+      ? `<div class="fh-subhead">⛰ Nearby summits</div>` +
+        peaks.map((p, i) =>
+          `<a class="fc-link" data-peak="${i}">⛰ ${p.name} · ${p.h}m · ${Math.round(p.dist)}km</a>`).join("")
+      : `<div class="fh-note">No summits within ${FORECAST_PEAK_RADIUS_KM}km — showing the area forecast above.</div>`;
+
+    sheet.innerHTML = `
+      <div class="sheet-grip"><span></span></div>
+      <div class="sheet-head">
+        <div>
+          <h2>⛅ Forecast near here</h2>
+          <div class="coords">${c.lat.toFixed(3)}, ${c.lng.toFixed(3)}</div>
+        </div>
+        <button class="sheet-close" onclick="document.getElementById('sheet').classList.remove('open')">✕</button>
+      </div>
+      <div class="sheet-body">
+        <div class="fh-subhead">Area forecast (valley / general)</div>
+        <div class="fc-links">
+          ${areaRow}
+        </div>
+        <div class="fc-links">
+          ${peakRows}
+        </div>
+        <div class="attribution">
+          Area forecast: Met Office. Summit forecasts: mountain-forecast.com.
+          Pick whichever matches where you're headed.
+        </div>
+      </div>`;
+
+    if (area) {
+      sheet.querySelector("#fh-area").addEventListener("click", () => {
+        sheet.classList.remove("open");
+        S.openForecast(area.id, "metoffice");
+      });
     }
-    S.toast(`Nearest Met Office area: ${nearest.name}`);
-    S.openForecast(nearest.id, "metoffice");
+    peaks.forEach((p, i) => {
+      const el = sheet.querySelector(`[data-peak="${i}"]`);
+      if (el) el.addEventListener("click", () => { sheet.classList.remove("open"); openPeak(p); });
+    });
   }
 
   // Great-circle (Haversine) distance in km between two lat/lon points.
@@ -212,6 +269,19 @@
       if (d < bestD) { bestD = d; best = a; }
     }
     return best;
+  }
+
+  // Up to `max` peaks within `radiusKm` of a point, nearest first. Each result
+  // is a copy of the peak record with a `.dist` (km) added.
+  function nearbyPeaks(lat, lon, radiusKm, max) {
+    const within = [];
+    for (const p of forecastPeaks) {
+      if (p.lat == null || p.lon == null) continue;
+      const d = haversineKm(lat, lon, p.lat, p.lon);
+      if (d <= radiusKm) within.push({ ...p, dist: d });
+    }
+    within.sort((a, b) => a.dist - b.dist);
+    return within.slice(0, max);
   }
 
   // Centre the map on the device location. `userInitiated` controls messaging:

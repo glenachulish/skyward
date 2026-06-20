@@ -1145,3 +1145,24 @@ body.winter .fab.fab-secondary { color: #fff; }
   color: var(--accent2, #5f8a82);
 }
 body.winter .src-badge { color: #fff; }
+
+
+/* ===========================================================================
+   SESSION 10d — "Forecast here" choice sheet (valley area + nearby summits).
+   Quiet section labels inside the sheet. Appended, marker-guarded.
+   SKYWARD-S10D-MARKER
+   ======================================================================== */
+.fh-subhead {
+  font-family: var(--display);
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--accent);
+  margin: .9rem 0 .35rem;
+}
+.fh-subhead:first-child { margin-top: 0; }
+.fh-note {
+  font-size: .82rem;
+  color: var(--ink-dim);
+  padding: .3rem 0;
+}
